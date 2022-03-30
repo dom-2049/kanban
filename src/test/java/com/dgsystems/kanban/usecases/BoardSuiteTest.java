@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CreateBoardTest {
+class BoardSuiteTest {
 
     public static final String BOARD_NAME = "new board";
     public static final String CARD_LIST_TITLE = "to do";
