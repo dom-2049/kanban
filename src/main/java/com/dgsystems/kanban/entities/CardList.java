@@ -1,4 +1,6 @@
 package com.dgsystems.kanban.entities;
 
-public record CardList(String title) {
+import java.util.List;
+
+public record CardList(String title, List<Card> cards) {
 }
