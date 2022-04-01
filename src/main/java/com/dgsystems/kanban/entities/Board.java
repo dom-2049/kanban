@@ -18,4 +18,8 @@ public record Board(String title, List<CardList> cardLists) {
                         .collect(Collectors.toList())
         );
     }
+
+    public Board move(Card card, String from, String to) {
+        return null;
+    }
 }
