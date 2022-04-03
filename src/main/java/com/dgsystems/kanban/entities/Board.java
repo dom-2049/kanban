@@ -20,6 +20,16 @@ public record Board(String title, List<CardList> cardLists) {
     }
 
     public Board move(Card card, String from, String to) {
-        return null;
+        List<CardList> cardLists = cardLists().stream().map(cl -> {
+            if(cl.title().equals(from)) {
+                return cl.remove(card);
+            } else if(cl.title().equals(to)) {
+                return cl.add(card);
+            } else {
+                return cl;
+            }
+        }).collect(Collectors.toList());
+
+        return new Board(title, cardLists);
     }
 }
