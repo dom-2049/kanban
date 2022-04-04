@@ -12,12 +12,14 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class BoardSuiteTest {
 
     public static final String BOARD_NAME = "new board";
     public static final String CARD_LIST_TITLE = "to do";
+    public static final String TO_DO = "to do";
+    public static final String IN_PROGRESS = "in progress";
+
     public BoardRepository boardRepository;
 
     @BeforeEach
@@ -78,10 +80,10 @@ class BoardSuiteTest {
         Card card = new Card("do the dishes", "must do the dishes!");
 
         createBoard.execute(BOARD_NAME);
-        addCardListToBoard.execute(BOARD_NAME, "to do");
-        addCardListToBoard.execute(BOARD_NAME, "in progress");
-        addCardToCardList.execute(BOARD_NAME, "to do", card);
-        moveCardFromOneListToAnother.execute(BOARD_NAME, "to do", "in progress", card);
+        addCardListToBoard.execute(BOARD_NAME, TO_DO);
+        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
+        addCardToCardList.execute(BOARD_NAME, TO_DO, card);
+        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card);
 
         Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
         CardList first = board.cardLists().get(0);
@@ -98,9 +100,9 @@ class BoardSuiteTest {
         GetBoard getBoard = new GetBoard(boardRepository);
 
         createBoard.execute(BOARD_NAME);
-        GetBoardResponse response = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board response = getBoard.execute(BOARD_NAME).orElseThrow();
 
-        assertThat(response).isEqualTo(new GetBoardResponse(BOARD_NAME));
+        assertThat(response.title()).isEqualTo(BOARD_NAME);
         //TODO: validate card lists are immutable
     }
 }

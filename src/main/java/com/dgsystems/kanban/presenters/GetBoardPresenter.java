@@ -1,9 +1,9 @@
 package com.dgsystems.kanban.presenters;
 
-import com.dgsystems.kanban.usecases.GetBoardResponse;
+import com.dgsystems.kanban.entities.Board;
 
 public class GetBoardPresenter {
-    public GetBoardOutput present(GetBoardResponse getBoardResponse) {
-        return new GetBoardOutput(getBoardResponse.title());
+    public GetBoardOutput present(Board boardResponse) {
+        return new GetBoardOutput(boardResponse.title());
     }
 }

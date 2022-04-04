@@ -1,6 +1,5 @@
 package com.dgsystems.kanban.web;
 
-import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
 import com.dgsystems.kanban.presenters.GetBoardOutput;
 import com.dgsystems.kanban.presenters.GetBoardPresenter;
