@@ -13,7 +13,7 @@ public class InMemoryBoardRepository implements BoardRepository {
 
     @Override
     public Optional<Board> getBoard(String boardName) {
-        return boards.stream().findFirst();
+        return boards.stream().filter(b -> b.title().equals(boardName)).findFirst();
     }
 
     @Override

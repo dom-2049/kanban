@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class BoardSuiteTest {
 
@@ -88,5 +89,18 @@ class BoardSuiteTest {
 
         assertThat(first.cards()).filteredOn(c -> c.title().equals(card.title())).isEmpty();
         assertThat(second.cards()).filteredOn(c -> c.title().equals(card.title())).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Should get board")
+    void shouldGetBoard() {
+        CreateBoard createBoard = new CreateBoard(boardRepository);
+        GetBoard getBoard = new GetBoard(boardRepository);
+
+        createBoard.execute(BOARD_NAME);
+        GetBoardResponse response = getBoard.execute(BOARD_NAME).orElseThrow();
+
+        assertThat(response).isEqualTo(new GetBoardResponse(BOARD_NAME));
+        //TODO: validate card lists are immutable
     }
 }
