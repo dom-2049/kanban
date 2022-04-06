@@ -1,5 +1,7 @@
 package com.dgsystems.kanban.usecases;
 
+import akka.actor.ActorSystem;
+import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.CardList;
@@ -30,6 +32,7 @@ class BoardSuiteTest {
     @Test
     @DisplayName("Should create empty board")
     void shouldCreateEmptyBoard() {
+        Context.actorSystem = ActorSystem.create();
         CreateBoard createBoard = new CreateBoard(boardRepository);
         Board expected = new Board(BOARD_NAME, Collections.emptyList());
 
@@ -42,6 +45,7 @@ class BoardSuiteTest {
     @Test
     @DisplayName("Should add card list to board")
     void shouldAddCardListToBoard() {
+        Context.actorSystem = ActorSystem.create();
         CreateBoard createBoard = new CreateBoard(boardRepository);
         createBoard.execute(BOARD_NAME);
 
@@ -73,13 +77,14 @@ class BoardSuiteTest {
     @Test
     @DisplayName("Should move card between lists")
     void shouldMoveCardBetweenLists() {
+        Context.actorSystem = ActorSystem.create();
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);
         Card card = new Card("do the dishes", "must do the dishes!");
 
         createBoard.execute(BOARD_NAME);
+        MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
         addCardToCardList.execute(BOARD_NAME, TO_DO, card);

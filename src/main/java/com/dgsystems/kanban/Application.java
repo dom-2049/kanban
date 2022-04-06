@@ -1,5 +1,7 @@
 package com.dgsystems.kanban;
 
+import akka.actor.ActorSystem;
+import com.dgsystems.kanban.boundary.Context;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +15,8 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+        ActorSystem actorSystem = ActorSystem.create();
+        Context.actorSystem = actorSystem;
     }
 
     @Bean

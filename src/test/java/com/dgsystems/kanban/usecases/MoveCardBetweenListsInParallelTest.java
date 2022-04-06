@@ -1,5 +1,6 @@
 package com.dgsystems.kanban.usecases;
 
+import com.dgsystems.kanban.boundary.BoardManager;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
@@ -33,7 +34,7 @@ public class MoveCardBetweenListsInParallelTest {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
 
-        createBoard.execute(BOARD_NAME);
+        Board boardResponse = createBoard.execute(BOARD_NAME);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
         addCardListToBoard.execute(BOARD_NAME, DONE);
@@ -87,8 +88,6 @@ public class MoveCardBetweenListsInParallelTest {
             }
         }
     }
-
-
 }
 
 
