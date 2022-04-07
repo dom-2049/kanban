@@ -27,12 +27,12 @@ class BoardSuiteTest {
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
+        Context.actorSystem = ActorSystem.create();
     }
 
     @Test
     @DisplayName("Should create empty board")
     void shouldCreateEmptyBoard() {
-        Context.actorSystem = ActorSystem.create();
         CreateBoard createBoard = new CreateBoard(boardRepository);
         Board expected = new Board(BOARD_NAME, Collections.emptyList());
 
@@ -45,7 +45,6 @@ class BoardSuiteTest {
     @Test
     @DisplayName("Should add card list to board")
     void shouldAddCardListToBoard() {
-        Context.actorSystem = ActorSystem.create();
         CreateBoard createBoard = new CreateBoard(boardRepository);
         createBoard.execute(BOARD_NAME);
 

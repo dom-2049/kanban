@@ -13,6 +13,7 @@ public class BoardActor extends AbstractActor {
     record Move(Card card, String from, String to) { }
     record AddCardList(CardList cardList) { }
     record CreateBoard(String boardName, List<CardList> cardLists) { }
+    record AddCardToCardList(String cardListTitle, Card card) { }
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
@@ -40,9 +41,14 @@ public class BoardActor extends AbstractActor {
                             sender().tell(board, self());
                         }
                 )
+                .match(
+                        AddCardToCardList.class,
+                        a -> {
+                            board = board.addCard(a.cardListTitle(), a.card());
+                            sender().tell(board, self());
+                        }
+                )
                 .matchAny(o -> log.info("received unknown message"))
                 .build();
     }
-
-
 }

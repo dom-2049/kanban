@@ -1,6 +1,7 @@
 package com.dgsystems.kanban.boundary;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.Card;
@@ -9,42 +10,53 @@ import com.dgsystems.kanban.entities.CardList;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+import static com.dgsystems.kanban.boundary.BoardActor.CreateBoard;
+import static com.dgsystems.kanban.boundary.BoardActor.AddCardList;
+import static com.dgsystems.kanban.boundary.BoardActor.Move;
+import static com.dgsystems.kanban.boundary.BoardActor.AddCardToCardList;
 
 import static akka.pattern.Patterns.ask;
 
 public class BoardManager {
-public BoardManager() {
-    //TODO: Create actor only on createBoard, get the reference for the actor afterwards.
-        boardActor = Context.actorSystem.actorOf(Props.create(BoardActor.class));
-    }
-
-    private final ActorRef boardActor;
+    public static final String WHITESPACE = " ";
+    public static final String UNDERSCORE = "_";
+    public static final Duration TIMEOUT = Duration.ofMillis(1000);
 
     public Board createBoard(String boardName, List<CardList> cardLists) {
-        BoardActor.CreateBoard addCardList = new BoardActor.CreateBoard(boardName, cardLists);
-        CompletableFuture<Object> boardFuture = ask(boardActor, addCardList, Duration.ofMillis(1000)).toCompletableFuture();
-        CompletableFuture<Board> transformed =
-                CompletableFuture.completedFuture(boardFuture)
-                        .thenApply(v -> (Board) boardFuture.join());
-        return transformed.join();
+        ActorRef boardActor = Context.actorSystem.actorOf(Props.create(BoardActor.class), boardName.replace(WHITESPACE, UNDERSCORE));
+        CreateBoard addCardList = new CreateBoard(boardName, cardLists);
+        return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
     public Board addCardList(Board board, CardList cardList) {
-        BoardActor.AddCardList addCardList = new BoardActor.AddCardList(cardList);
-        CompletableFuture<Object> boardFuture = ask(boardActor, addCardList, Duration.ofMillis(1000)).toCompletableFuture();
-        CompletableFuture<Board> transformed =
-                CompletableFuture.completedFuture(boardFuture)
-                        .thenApply(v -> (Board) boardFuture.join());
-        return transformed.join();
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        AddCardList addCardList = new AddCardList(cardList);
+        return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
     public Board move(Board board, Card card, String from, String to) {
-        // actor selection or other way to get the actor by the board name
-        BoardActor.Move move = new BoardActor.Move(card, from, to);
-        CompletableFuture<Object> boardFuture = ask(boardActor, move, Duration.ofMillis(1000)).toCompletableFuture();
-        CompletableFuture<Board> transformed =
-                CompletableFuture.completedFuture(boardFuture)
-                    .thenApply(v -> (Board) boardFuture.join());
-        return transformed.join();
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        Move move = new Move(card, from, to);
+        return transform(ask(boardActor, move, TIMEOUT));
+    }
+
+    public Board addCardToCardList(Board board, String cardListTitle, Card card) {
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        AddCardToCardList addCardToCardList = new AddCardToCardList(cardListTitle, card);
+        return transform(ask(boardActor, addCardToCardList, TIMEOUT));
+    }
+
+    private String actorPath(Board board) {
+        return "/user/" + board.title().replace(WHITESPACE, UNDERSCORE);
+    }
+
+    private Board transform(CompletionStage<Object> completionStage) {
+        CompletableFuture<Object> boardFuture = completionStage.toCompletableFuture();
+        return CompletableFuture
+                .completedFuture(boardFuture)
+                .thenApply(v -> (Board) boardFuture.join())
+                .join();
     }
 }

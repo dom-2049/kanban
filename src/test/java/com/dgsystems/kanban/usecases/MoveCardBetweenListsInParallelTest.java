@@ -1,6 +1,7 @@
 package com.dgsystems.kanban.usecases;
 
-import com.dgsystems.kanban.boundary.BoardManager;
+import akka.actor.ActorSystem;
+import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
@@ -23,6 +24,7 @@ public class MoveCardBetweenListsInParallelTest {
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
+        Context.actorSystem = ActorSystem.create();
     }
 
     @Test

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.dgsystems.kanban.usecases.BoardSuiteTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2022-04-07T14:33:56" hostname="DESKTOP" time="0.861">
+  <properties/>
+  <testcase name="Should add card list to board" classname="com.dgsystems.kanban.usecases.BoardSuiteTest" time="0.729"/>
+  <testcase name="Should add card to card list" classname="com.dgsystems.kanban.usecases.BoardSuiteTest" time="0.033"/>
+  <testcase name="Should get board" classname="com.dgsystems.kanban.usecases.BoardSuiteTest" time="0.028"/>
+  <testcase name="Should create empty board" classname="com.dgsystems.kanban.usecases.BoardSuiteTest" time="0.023"/>
+  <testcase name="Should move card between lists" classname="com.dgsystems.kanban.usecases.BoardSuiteTest" time="0.045"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
