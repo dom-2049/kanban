@@ -36,7 +36,7 @@ public class MoveCardBetweenListsInParallelTest {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
 
-        Board boardResponse = createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
         addCardListToBoard.execute(BOARD_NAME, DONE);
