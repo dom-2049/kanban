@@ -5,6 +5,8 @@ import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
+import com.dgsystems.kanban.entities.MultipleAccessValidator;
+import com.dgsystems.kanban.infrastructure.HashingMultipleAccessValidator;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -89,7 +91,8 @@ public class MoveCardBetweenListsInParallelTest {
             try {
                 gate.await();
                 Thread.sleep(delay * 1000);
-                moveCardBetweenLists.execute(BOARD_NAME, from, to, card, beforeExecutionBoard.hashCode());
+                MultipleAccessValidator<Board> multipleAccessValidator = new HashingMultipleAccessValidator(beforeExecutionBoard.hashCode());
+                moveCardBetweenLists.execute(BOARD_NAME, from, to, card, multipleAccessValidator);
             } catch (InterruptedException | BrokenBarrierException | BoardAlreadyChangedException e) {
                 e.printStackTrace();
             }
