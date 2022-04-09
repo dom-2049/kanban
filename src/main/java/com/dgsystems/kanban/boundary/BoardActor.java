@@ -4,13 +4,16 @@ import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.CardList;
+import scala.util.Either;
+import scala.util.Right;
 
 import java.util.List;
 
 public class BoardActor extends AbstractActor {
-    record Move(Card card, String from, String to) { }
+    record Move(Card card, String from, String to, int previousHashCode) { }
     record AddCardList(CardList cardList) { }
     record CreateBoard(String boardName, List<CardList> cardLists) { }
     record AddCardToCardList(String cardListTitle, Card card) { }
@@ -24,8 +27,13 @@ public class BoardActor extends AbstractActor {
                 .match(
                         Move.class,
                         m -> {
-                            Board newBoard = board.move(m.card, m.from, m.to);
-                            sender().tell(newBoard, self());
+                            Either<BoardAlreadyChangedException, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode);
+
+                            if (either instanceof Right right) {
+                                this.board = (Board) right.value();
+                            }
+
+                            sender().tell(either, self());
                         })
                 .match(
                         CreateBoard.class,

@@ -4,8 +4,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.Props;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.CardList;
+import scala.util.Either;
 
 import java.time.Duration;
 import java.util.List;
@@ -36,9 +38,9 @@ public class BoardManager {
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
-    public Board move(Board board, Card card, String from, String to) {
+    public Either<BoardAlreadyChangedException, Board> move(Board board, Card card, String from, String to, int previousHashCode) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        Move move = new Move(card, from, to);
+        Move move = new Move(card, from, to, previousHashCode);
         return transform(ask(boardActor, move, TIMEOUT));
     }
 
@@ -52,11 +54,11 @@ public class BoardManager {
         return "/user/" + board.title().replace(WHITESPACE, UNDERSCORE);
     }
 
-    private Board transform(CompletionStage<Object> completionStage) {
+    private <T> T transform(CompletionStage<Object> completionStage) {
         CompletableFuture<Object> boardFuture = completionStage.toCompletableFuture();
         return CompletableFuture
                 .completedFuture(boardFuture)
-                .thenApply(v -> (Board) boardFuture.join())
+                .thenApply(v -> (T) boardFuture.join())
                 .join();
     }
 }

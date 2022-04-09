@@ -3,6 +3,7 @@ package com.dgsystems.kanban.usecases;
 import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,7 @@ public class MoveCardBetweenListsInParallelTest {
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
+        GetBoard getBoard = new GetBoard(boardRepository);
 
         createBoard.execute(BOARD_NAME);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
@@ -42,10 +44,12 @@ public class MoveCardBetweenListsInParallelTest {
         addCardListToBoard.execute(BOARD_NAME, DONE);
         addCardToCardList.execute(BOARD_NAME, IN_PROGRESS,card);
 
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME).orElseThrow();
+
         final CyclicBarrier gate = new CyclicBarrier(3);
 
-        Thread t1 = new Thread(new ParallelCardMove(2, card, IN_PROGRESS, TO_DO, gate));
-        Thread t2 = new Thread(new ParallelCardMove(4, card, IN_PROGRESS, DONE, gate));
+        Thread t1 = new Thread(new ParallelCardMove(2, card, IN_PROGRESS, TO_DO, gate, beforeExecutionBoard));
+        Thread t2 = new Thread(new ParallelCardMove(4, card, IN_PROGRESS, DONE, gate, beforeExecutionBoard));
 
         t1.start();
         t2.start();
@@ -55,7 +59,6 @@ public class MoveCardBetweenListsInParallelTest {
         t1.join();
         t2.join();
 
-        GetBoard getBoard = new GetBoard(boardRepository);
         Board board = getBoard.execute(BOARD_NAME).orElseThrow();
 
         assertThat(board.cardLists().get(0).cards()).isNotEmpty();
@@ -69,13 +72,15 @@ public class MoveCardBetweenListsInParallelTest {
         private final String from;
         private final String to;
         private final CyclicBarrier gate;
+        private final Board beforeExecutionBoard;
 
-        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate) {
+        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate, Board beforeExecutionBoard) {
             this.delay = delay;
             this.card = card;
             this.from = from;
             this.to = to;
             this.gate = gate;
+            this.beforeExecutionBoard = beforeExecutionBoard;
         }
 
         @Override
@@ -84,8 +89,8 @@ public class MoveCardBetweenListsInParallelTest {
             try {
                 gate.await();
                 Thread.sleep(delay * 1000);
-                moveCardBetweenLists.execute(BOARD_NAME, from, to, card);
-            } catch (InterruptedException | BrokenBarrierException e) {
+                moveCardBetweenLists.execute(BOARD_NAME, from, to, card, beforeExecutionBoard.hashCode());
+            } catch (InterruptedException | BrokenBarrierException | BoardAlreadyChangedException e) {
                 e.printStackTrace();
             }
         }

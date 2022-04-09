@@ -1,5 +1,9 @@
 package com.dgsystems.kanban.entities;
 
+import scala.util.Either;
+import scala.util.Left;
+import scala.util.Right;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +23,11 @@ public record Board(String title, List<CardList> cardLists) {
         );
     }
 
-    public Board move(Card card, String from, String to) {
+    public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, int previousHashCode) {
+        if(previousHashCode != this.hashCode()) {
+            return Left.apply(new BoardAlreadyChangedException());
+        }
+
         List<CardList> cardLists = cardLists().stream().map(cl -> {
             if(cl.title().equals(from)) {
                 return cl.remove(card);
@@ -30,6 +38,6 @@ public record Board(String title, List<CardList> cardLists) {
             }
         }).collect(Collectors.toList());
 
-        return new Board(title, cardLists);
+        return Right.apply( new Board(title, cardLists));
     }
 }

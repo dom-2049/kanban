@@ -3,6 +3,7 @@ package com.dgsystems.kanban.usecases;
 import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.CardList;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
@@ -75,11 +76,11 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should move card between lists")
-    void shouldMoveCardBetweenLists() {
-        Context.actorSystem = ActorSystem.create();
+    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException {
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
+        GetBoard getBoard = new GetBoard(boardRepository);
         Card card = new Card("do the dishes", "must do the dishes!");
 
         createBoard.execute(BOARD_NAME);
@@ -87,9 +88,11 @@ class BoardSuiteTest {
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
         addCardToCardList.execute(BOARD_NAME, TO_DO, card);
-        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card);
 
-        Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME).orElseThrow();
+        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode());
+
+        Board board = getBoard.execute(BOARD_NAME).orElseThrow();
         CardList first = board.cardLists().get(0);
         CardList second = board.cardLists().get(1);
 
