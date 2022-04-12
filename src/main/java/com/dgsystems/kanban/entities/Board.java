@@ -23,8 +23,8 @@ public record Board(String title, List<CardList> cardLists) {
         );
     }
 
-    public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, MultipleAccessValidator<Board> multipleAccessValidator) {
-        if(!multipleAccessValidator.canChange(this)) {
+    public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, int previousHashCode) {
+        if(previousHashCode != this.hashCode()) {
             return Left.apply(new BoardAlreadyChangedException());
         }
 

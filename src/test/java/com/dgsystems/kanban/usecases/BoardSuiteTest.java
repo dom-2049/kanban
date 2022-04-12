@@ -2,8 +2,10 @@ package com.dgsystems.kanban.usecases;
 
 import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
-import com.dgsystems.kanban.entities.*;
-import com.dgsystems.kanban.infrastructure.HashingMultipleAccessValidator;
+import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
+import com.dgsystems.kanban.entities.Card;
+import com.dgsystems.kanban.entities.CardList;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -88,8 +90,7 @@ class BoardSuiteTest {
         addCardToCardList.execute(BOARD_NAME, TO_DO, card);
 
         Board beforeExecutionBoard = getBoard.execute(BOARD_NAME).orElseThrow();
-        MultipleAccessValidator<Board> multipleAccessValidator = new HashingMultipleAccessValidator(beforeExecutionBoard.hashCode());
-        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, multipleAccessValidator);
+        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode());
 
         Board board = getBoard.execute(BOARD_NAME).orElseThrow();
         CardList first = board.cardLists().get(0);
