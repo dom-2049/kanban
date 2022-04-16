@@ -3,10 +3,7 @@ package com.dgsystems.kanban.infrastructure;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.usecases.BoardRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class InMemoryBoardRepository implements BoardRepository {
     private final List<Board> boards = new ArrayList<>();
@@ -28,5 +25,10 @@ public class InMemoryBoardRepository implements BoardRepository {
             boards.remove(filtered.get(0));
             boards.add(board);
         }
+    }
+
+    @Override
+    public List<Board> getAll() {
+        return Collections.unmodifiableList(boards);
     }
 }

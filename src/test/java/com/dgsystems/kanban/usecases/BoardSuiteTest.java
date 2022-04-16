@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -111,5 +112,20 @@ class BoardSuiteTest {
 
         assertThat(response.title()).isEqualTo(BOARD_NAME);
         //TODO: validate card lists are immutable
+    }
+
+    @Test
+    @DisplayName("Should get all boards")
+    void shouldGetAllBoards() {
+        CreateBoard createBoard = new CreateBoard(boardRepository);
+        GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+
+        createBoard.execute("work");
+        createBoard.execute("hobby");
+        List<Board> response = getAllBoards.execute();
+
+        assertThat(response).hasSize(2);
+        assertThat(response.get(0).title()).isEqualTo("work");
+        assertThat(response.get(1).title()).isEqualTo("hobby");
     }
 }

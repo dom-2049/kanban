@@ -7,14 +7,18 @@ import com.dgsystems.kanban.usecases.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/board")
 public class BoardController {
     public BoardController() {
         boardRepository = new InMemoryBoardRepository();
     }
 
-    private BoardRepository boardRepository;
+    private final BoardRepository boardRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -30,5 +34,14 @@ public class BoardController {
             GetBoardPresenter presenter = new GetBoardPresenter();
             return presenter.present(b);
         }).orElseThrow();
+    }
+
+    @GetMapping
+    public List<GetBoardOutput> getAll() {
+        return List.of(
+                    new GetBoardOutput("new board 1"),
+                    new GetBoardOutput("new board 2"),
+                    new GetBoardOutput("new board 3")
+                );
     }
 }
