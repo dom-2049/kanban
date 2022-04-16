@@ -1,13 +1,14 @@
 package com.dgsystems.kanban.web;
 
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
+import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
+import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.GetBoardOutput;
 import com.dgsystems.kanban.presenters.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,11 +38,9 @@ public class BoardController {
     }
 
     @GetMapping
-    public List<GetBoardOutput> getAll() {
-        return List.of(
-                    new GetBoardOutput("new board 1"),
-                    new GetBoardOutput("new board 2"),
-                    new GetBoardOutput("new board 3")
-                );
+    public List<GetAllBoardsOutput> getAll() {
+        GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+        GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
+        return presenter.present(getAllBoards.execute());
     }
 }
