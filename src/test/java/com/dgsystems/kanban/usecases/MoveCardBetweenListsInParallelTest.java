@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -31,7 +32,7 @@ public class MoveCardBetweenListsInParallelTest {
     @Test
     @DisplayName("Should not execute last movement when card is moved in parallel")
     void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException {
-        Card card = new Card("do the dishes", "must do the dishes!");
+        Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!");
 
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);

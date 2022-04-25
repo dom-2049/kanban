@@ -1,4 +1,6 @@
 package com.dgsystems.kanban.entities;
 
-public record Card(String title, String description) {
+import java.util.UUID;
+
+public record Card(UUID id, String title, String description) {
 }

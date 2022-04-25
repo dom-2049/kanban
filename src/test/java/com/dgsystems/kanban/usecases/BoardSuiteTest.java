@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,7 +69,7 @@ class BoardSuiteTest {
         addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
 
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card("card title", "card description"));
+        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description"));
 
         Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
 
@@ -82,7 +83,7 @@ class BoardSuiteTest {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
-        Card card = new Card("do the dishes", "must do the dishes!");
+        Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!");
 
         createBoard.execute(BOARD_NAME);
         MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);

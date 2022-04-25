@@ -6,6 +6,7 @@ import com.dgsystems.kanban.entities.CardList;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 public class AddCardListToBoard {
     private final BoardRepository boardRepository;
@@ -18,7 +19,7 @@ public class AddCardListToBoard {
         Optional<Board> optional = boardRepository.getBoard(boardName);
         optional.map(b -> {
             BoardManager boardManager = new BoardManager();
-            Board updated = boardManager.addCardList(b, new CardList(cardListTitle, Collections.emptyList()));
+            Board updated = boardManager.addCardList(b, new CardList(UUID.randomUUID(), cardListTitle, Collections.emptyList()));
             boardRepository.save(updated);
             return updated;
         }).orElseThrow();
