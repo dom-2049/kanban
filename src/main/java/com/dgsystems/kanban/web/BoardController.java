@@ -1,5 +1,6 @@
 package com.dgsystems.kanban.web;
 
+import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -42,5 +44,19 @@ public class BoardController {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
         return presenter.present(getAllBoards.execute());
+    }
+
+    @PostMapping(value = "/{boardName}/cardlist")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addCardListToBoard(@RequestBody String title, @PathVariable String boardName) {
+        AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
+        addCardListToBoard.execute(boardName, title);
+    }
+
+    @PostMapping(value = "/{board}/cardlist/{cardlist}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addCardToCardList(@RequestBody String cardTitle, @PathVariable String board, @PathVariable String cardlist) {
+        AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
+        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), cardTitle, ""));
     }
 }
