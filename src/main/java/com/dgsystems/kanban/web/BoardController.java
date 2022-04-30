@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5019")
 @RequestMapping("/board")
 public class BoardController {
     public BoardController() {
@@ -48,15 +48,15 @@ public class BoardController {
 
     @PostMapping(value = "/{boardName}/cardlist")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardListToBoard(@RequestBody String title, @PathVariable String boardName) {
+    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName) {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(boardName, title);
+        addCardListToBoard.execute(boardName, request.cardList());
     }
 
     @PostMapping(value = "/{board}/cardlist/{cardlist}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardToCardList(@RequestBody String cardTitle, @PathVariable String board, @PathVariable String cardlist) {
+    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist) {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), cardTitle, ""));
+        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), ""));
     }
 }
