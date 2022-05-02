@@ -3,10 +3,7 @@ package com.dgsystems.kanban.boundary;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.Props;
-import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
-import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.entities.CardList;
+import com.dgsystems.kanban.entities.*;
 import scala.util.Either;
 
 import java.time.Duration;
@@ -18,6 +15,7 @@ import static com.dgsystems.kanban.boundary.BoardActor.CreateBoard;
 import static com.dgsystems.kanban.boundary.BoardActor.AddCardList;
 import static com.dgsystems.kanban.boundary.BoardActor.Move;
 import static com.dgsystems.kanban.boundary.BoardActor.AddCardToCardList;
+import static com.dgsystems.kanban.boundary.BoardActor.AddMemberToCard;
 
 import static akka.pattern.Patterns.ask;
 
@@ -50,6 +48,12 @@ public class BoardManager {
         return transform(ask(boardActor, addCardToCardList, TIMEOUT));
     }
 
+    public Board addMemberToCard(Board board, String cardList, Card card, TeamMember teamMember) {
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        AddMemberToCard addMemberToCard = new BoardActor.AddMemberToCard(cardList, card, teamMember);
+        return transform(ask(boardActor, addMemberToCard, TIMEOUT));
+    }
+
     private String actorPath(Board board) {
         return "/user/" + board.title().replace(WHITESPACE, UNDERSCORE);
     }
@@ -61,4 +65,5 @@ public class BoardManager {
                 .thenApply(v -> (T) boardFuture.join())
                 .join();
     }
+
 }

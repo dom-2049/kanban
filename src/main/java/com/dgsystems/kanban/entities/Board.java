@@ -40,4 +40,24 @@ public record Board(String title, List<CardList> cardLists) {
 
         return Right.apply( new Board(title, cardLists));
     }
+
+    public Board addMemberToCard(String cardList, Card card, TeamMember teamMember) {
+        List<CardList> cardLists = cardLists().stream().map(cl -> {
+            if(cl.title().equals(cardList)) {
+                List<Card> cards = cl.cards().stream().map(c -> {
+                    if(c.title().equals(card.title())) {
+                        return c.addMember(teamMember);
+                    } else {
+                        return c;
+                    }
+                }).collect(Collectors.toList());
+
+                return new CardList(cl.id(), cl.title(), cards);
+            } else {
+                return cl;
+            }
+        }).collect(Collectors.toList());
+
+        return new Board(title, cardLists);
+    }
 }
