@@ -4,6 +4,7 @@ import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
+import com.dgsystems.kanban.infrastructure.InMemoryTeamMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +20,12 @@ public class AddTeamMemberToCardTest {
     public static final String LIST_TITLE = "todo";
     private Card card;
     private BoardRepository boardRepository;
+    private InMemoryTeamMemberRepository teamMemberRepository;
 
     @Test
     @DisplayName("Should add team member to card")
     void shouldAddTeamMemberToCard() throws MemberNotInTeamException {
-        AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(new TeamMemberTestRepository(), boardRepository);
+        AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
         TeamMember teamMember = new TeamMember("username");
         addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, teamMember);
         Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME).orElseThrow();
@@ -44,6 +46,8 @@ public class AddTeamMemberToCardTest {
         addCardListToBoard.execute(BOARD_NAME, LIST_TITLE);
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);
+        teamMemberRepository = new InMemoryTeamMemberRepository();
+        teamMemberRepository.save(new TeamMember("username"));
     }
 
     private Card firstCard(List<CardList> cardListList) {
@@ -52,14 +56,5 @@ public class AddTeamMemberToCardTest {
 
     private CardList firstCardList(List<CardList> cardListList) {
         return cardListList.get(0);
-    }
-
-    static class TeamMemberTestRepository implements TeamMemberRepository {
-        List<TeamMember> members = List.of(new TeamMember("username"));
-
-        @Override
-        public Optional<TeamMember> getBy(String username) {
-            return members.stream().findFirst();
-        }
     }
 }
