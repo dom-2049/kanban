@@ -2,6 +2,7 @@ package com.dgsystems.kanban;
 
 import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
+import com.dgsystems.kanban.infrastructure.InMemoryUserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,6 +18,11 @@ public class Application {
         SpringApplication.run(Application.class, args);
         ActorSystem actorSystem = ActorSystem.create();
         Context.actorSystem = actorSystem;
+    }
+
+    @Bean
+    public InMemoryUserRepository inMemoryUserRepository() {
+        return new InMemoryUserRepository();
     }
 
     @Bean

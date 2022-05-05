@@ -103,3 +103,5 @@ fabric.properties
 .gradle/
 
 build/
+
+application.properties

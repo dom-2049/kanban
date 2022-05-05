@@ -14,13 +14,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 	@Autowired
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
 	private UserRepository userRepository;
+
 	@Autowired
+	public void setBcryptEncoder(PasswordEncoder bcryptEncoder) {
+		this.bcryptEncoder = bcryptEncoder;
+	}
+
 	private PasswordEncoder bcryptEncoder;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserAccount user = userRepository.findByUsername(username);
+		UserAccount user = userRepository.findByUsername(username).orElse(null);
 		if(user == null) {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
