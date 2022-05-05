@@ -1,5 +1,8 @@
-package com.dgsystems.kanban.web;
+package com.dgsystems.kanban.web.controllers;
 
+import com.dgsystems.kanban.web.JwtRequest;
+import com.dgsystems.kanban.web.JwtResponse;
+import com.dgsystems.kanban.web.UserAccountDTO;
 import com.dgsystems.kanban.web.security.JwtTokenUtil;
 import com.dgsystems.kanban.web.security.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin
+@CrossOrigin //TODO: Configure cross origin once development is done
 public class AuthenticationController {
 	@Autowired
 	public void setAuthenticationManager(AuthenticationManager authenticationManager) {

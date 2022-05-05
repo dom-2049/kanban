@@ -1,4 +1,4 @@
-package com.dgsystems.kanban.web;
+package com.dgsystems.kanban.web.controllers;
 
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
@@ -7,6 +7,8 @@ import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.getBoard.Board;
 import com.dgsystems.kanban.presenters.getBoard.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
+import com.dgsystems.kanban.web.AddCardListRequest;
+import com.dgsystems.kanban.web.AddCardRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
