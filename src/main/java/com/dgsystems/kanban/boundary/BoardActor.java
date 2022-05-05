@@ -14,7 +14,7 @@ public class BoardActor extends AbstractActor {
     record AddCardList(CardList cardList) { }
     record CreateBoard(String boardName, List<CardList> cardLists) { }
     record AddCardToCardList(String cardListTitle, Card card) { }
-    record AddMemberToCard(String cardList, Card card, TeamMember teamMember) { }
+    record AddMemberToCard(String cardList, Card card, BoardMember boardMember) { }
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
@@ -57,7 +57,7 @@ public class BoardActor extends AbstractActor {
                 .match(
                         AddMemberToCard.class,
                         a -> {
-                            board = board.addMemberToCard(a.cardList(), a.card(), a.teamMember());
+                            board = board.addMemberToCard(a.cardList(), a.card(), a.boardMember());
                             sender().tell(board, self());
                         }
                 )

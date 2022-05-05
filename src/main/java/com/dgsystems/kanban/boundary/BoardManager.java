@@ -48,9 +48,9 @@ public class BoardManager {
         return transform(ask(boardActor, addCardToCardList, TIMEOUT));
     }
 
-    public Board addMemberToCard(Board board, String cardList, Card card, TeamMember teamMember) {
+    public Board addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddMemberToCard addMemberToCard = new BoardActor.AddMemberToCard(cardList, card, teamMember);
+        AddMemberToCard addMemberToCard = new BoardActor.AddMemberToCard(cardList, card, boardMember);
         return transform(ask(boardActor, addMemberToCard, TIMEOUT));
     }
 

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
-import com.dgsystems.kanban.infrastructure.InMemoryTeamMemberRepository;
+import com.dgsystems.kanban.infrastructure.InMemoryBoardMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,21 +15,21 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AddTeamMemberToCardTest {
+public class AddBoardMemberToCardTest {
     public static final String BOARD_NAME = "work";
     public static final String LIST_TITLE = "todo";
     private Card card;
     private BoardRepository boardRepository;
-    private InMemoryTeamMemberRepository teamMemberRepository;
+    private InMemoryBoardMemberRepository teamMemberRepository;
 
     @Test
     @DisplayName("Should add team member to card")
     void shouldAddTeamMemberToCard() throws MemberNotInTeamException {
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
-        TeamMember teamMember = new TeamMember("username");
-        addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, teamMember);
+        BoardMember boardMember = new BoardMember("username");
+        addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, boardMember);
         Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME).orElseThrow();
-        assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(Optional.of(teamMember));
+        assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(Optional.of(boardMember));
     }
 
     @BeforeEach
@@ -46,8 +46,8 @@ public class AddTeamMemberToCardTest {
         addCardListToBoard.execute(BOARD_NAME, LIST_TITLE);
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);
-        teamMemberRepository = new InMemoryTeamMemberRepository();
-        teamMemberRepository.save(new TeamMember("username"));
+        teamMemberRepository = new InMemoryBoardMemberRepository();
+        teamMemberRepository.save(new BoardMember("username"));
     }
 
     private Card firstCard(List<CardList> cardListList) {
