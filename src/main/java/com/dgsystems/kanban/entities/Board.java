@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record Board(String title, List<CardList> cardLists) {
+public record Board(String title, List<CardList> cardLists, List<BoardMember> members) {
     public Board addCardList(CardList cardList) {
         List<CardList> newCardLists = new ArrayList<>(cardLists);
         newCardLists.add(cardList);
-        return new Board(title(), newCardLists);
+        return new Board(title(), newCardLists, members);
     }
 
     public Board addCard(String cardListTitle, Card card) {
         return new Board(
                 title,
                 cardLists.stream().map(cl -> cl.title().equals(cardListTitle) ? cl.add(card) : cl)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()), members
         );
     }
 
@@ -38,7 +38,7 @@ public record Board(String title, List<CardList> cardLists) {
             }
         }).collect(Collectors.toList());
 
-        return Right.apply(new Board(title, cardLists));
+        return Right.apply(new Board(title, cardLists, members));
     }
 
     public Board addMemberToCard(String cardList, Card card, BoardMember boardMember) {
@@ -58,6 +58,16 @@ public record Board(String title, List<CardList> cardLists) {
             }
         }).collect(Collectors.toList());
 
-        return new Board(title, cardLists);
+        return new Board(title, cardLists, members);
+    }
+
+    public Board addMember(BoardMember newMember) {
+        List<BoardMember> updatedMembers = new ArrayList<>(members);
+        updatedMembers.add(newMember);
+        return new Board(title(), cardLists(), updatedMembers);
+    }
+
+    public List<BoardMember> getAllMembers() {
+        return members();
     }
 }

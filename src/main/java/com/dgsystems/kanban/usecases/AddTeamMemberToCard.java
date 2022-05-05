@@ -6,13 +6,11 @@ import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.MemberNotInTeamException;
 import com.dgsystems.kanban.entities.BoardMember;
 
-import java.util.Optional;
-
 public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, BoardRepository boardRepository) {
     public void execute(String boardName, String cardList, Card card, BoardMember boardMember) throws MemberNotInTeamException {
-        if(isMemberInBoard(boardMember)) {
-            Board board = boardRepository.getBoard(boardName).orElseThrow();
-            BoardManager boardManager = new BoardManager();
+        BoardManager boardManager = new BoardManager();
+        Board board = boardRepository.getBoard(boardName).orElseThrow();
+        if (isMemberInBoard(boardMember, boardManager, board)) {
             Board newBoard = boardManager.addMemberToCard(board, cardList, card, boardMember);
             boardRepository.save(newBoard);
         } else {
@@ -20,8 +18,7 @@ public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, B
         }
     }
 
-    private boolean isMemberInBoard(BoardMember boardMember) {
-        Optional<BoardMember> optional = boardMemberRepository.getBy(boardMember.username());
-        return optional.isPresent();
+    private boolean isMemberInBoard(BoardMember boardMember, BoardManager boardManager, Board board) {
+        return boardManager.getAllMembers(board).stream().anyMatch(m -> m.username().equals(boardMember.username()));
     }
 }

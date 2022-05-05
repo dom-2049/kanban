@@ -37,7 +37,7 @@ class BoardSuiteTest {
     @DisplayName("Should create empty board")
     void shouldCreateEmptyBoard() {
         CreateBoard createBoard = new CreateBoard(boardRepository);
-        Board expected = new Board(BOARD_NAME, Collections.emptyList());
+        Board expected = new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList());
 
         createBoard.execute(BOARD_NAME);
         Optional<Board> board = boardRepository.getBoard(BOARD_NAME);

@@ -47,7 +47,8 @@ public class AddBoardMemberToCardTest {
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);
         teamMemberRepository = new InMemoryBoardMemberRepository();
-        teamMemberRepository.save(new BoardMember("username"));
+        AddMemberToBoard addMemberToBoard = new AddMemberToBoard(teamMemberRepository, boardRepository);
+        addMemberToBoard.execute(BOARD_NAME, new BoardMember("username"));
     }
 
     private Card firstCard(List<CardList> cardListList) {

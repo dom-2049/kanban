@@ -7,6 +7,7 @@ import com.dgsystems.kanban.entities.*;
 import scala.util.Either;
 import scala.util.Right;
 
+import java.util.Collections;
 import java.util.List;
 
 public class BoardActor extends AbstractActor {
@@ -15,6 +16,8 @@ public class BoardActor extends AbstractActor {
     record CreateBoard(String boardName, List<CardList> cardLists) { }
     record AddCardToCardList(String cardListTitle, Card card) { }
     record AddMemberToCard(String cardList, Card card, BoardMember boardMember) { }
+    record AddMemberToBoard(BoardMember newMember) { }
+    record GetAllMembers() { }
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
@@ -36,7 +39,7 @@ public class BoardActor extends AbstractActor {
                 .match(
                         CreateBoard.class,
                         c -> {
-                            board = new Board(c.boardName, c.cardLists);
+                            board = new Board(c.boardName, c.cardLists, Collections.emptyList());
                             sender().tell(board, self());
                         }
                 )
@@ -60,6 +63,17 @@ public class BoardActor extends AbstractActor {
                             board = board.addMemberToCard(a.cardList(), a.card(), a.boardMember());
                             sender().tell(board, self());
                         }
+                )
+                .match(
+                        AddMemberToBoard.class,
+                        a -> {
+                            board = board.addMember(a.newMember());
+                            sender().tell(board, self());
+                        }
+                )
+                .match(
+                        GetAllMembers.class,
+                        g -> sender().tell(board.getAllMembers(), self())
                 )
                 .matchAny(o -> log.info("received unknown message"))
                 .build();

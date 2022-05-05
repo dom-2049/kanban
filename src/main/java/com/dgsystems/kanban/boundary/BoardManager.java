@@ -16,6 +16,8 @@ import static com.dgsystems.kanban.boundary.BoardActor.AddCardList;
 import static com.dgsystems.kanban.boundary.BoardActor.Move;
 import static com.dgsystems.kanban.boundary.BoardActor.AddCardToCardList;
 import static com.dgsystems.kanban.boundary.BoardActor.AddMemberToCard;
+import static com.dgsystems.kanban.boundary.BoardActor.AddMemberToBoard;
+import static com.dgsystems.kanban.boundary.BoardActor.GetAllMembers;
 
 import static akka.pattern.Patterns.ask;
 
@@ -66,4 +68,15 @@ public class BoardManager {
                 .join();
     }
 
+    public Board addMemberToBoard(Board board, BoardMember newMember) {
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        AddMemberToBoard addMemberToBoard = new BoardActor.AddMemberToBoard(newMember);
+        return transform(ask(boardActor, addMemberToBoard, TIMEOUT));
+    }
+
+    public List<BoardMember> getAllMembers(Board board) {
+        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        GetAllMembers getAllMembers = new BoardActor.GetAllMembers();
+        return transform(ask(boardActor, getAllMembers, TIMEOUT));
+    }
 }
