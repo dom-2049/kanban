@@ -3,6 +3,7 @@ package com.dgsystems.kanban.usecases;
 import com.dgsystems.kanban.boundary.BoardManager;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.CardList;
+import com.jcabi.aspects.Loggable;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -15,6 +16,7 @@ public class AddCardListToBoard {
         boardRepository = repository;
     }
 
+    @Loggable(prepend = true)
     public void execute(String boardName, String cardListTitle) {
         Optional<Board> optional = boardRepository.getBoard(boardName);
         optional.map(b -> {

@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id "io.freefair.aspectj.post-compile-weaving" version "6.4.3"
 }
 
 group 'org.example'
@@ -28,6 +29,10 @@ dependencies {
     implementation 'javax.persistence:persistence-api:1.0.2'
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
     implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+    implementation 'org.aspectj:aspectjrt:1.9.9.1'
+    implementation 'com.jcabi:jcabi-aspects:0.23.2'
+
+    aspect group: 'com.jcabi', name: 'jcabi-aspects', version: '0.23.2'
 
     testImplementation 'org.assertj:assertj-core:3.22.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
