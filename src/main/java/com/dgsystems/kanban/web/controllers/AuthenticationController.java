@@ -5,6 +5,8 @@ import com.dgsystems.kanban.web.JwtResponse;
 import com.dgsystems.kanban.web.UserAccountDTO;
 import com.dgsystems.kanban.web.security.JwtTokenUtil;
 import com.dgsystems.kanban.web.security.JwtUserDetailsService;
+import com.jcabi.aspects.LogExceptions;
+import com.jcabi.aspects.Loggable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,7 +42,9 @@ public class AuthenticationController {
 	private AuthenticationManager authenticationManager;
 	private JwtTokenUtil jwtTokenUtil;
 	private JwtUserDetailsService userDetailsService;
-	
+
+	@LogExceptions
+	@Loggable(skipArgs = true, skipResult = true)
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -48,7 +52,8 @@ public class AuthenticationController {
 		final String token = jwtTokenUtil.generateToken(userDetails);
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
-	
+
+	@Loggable(skipResult = true, skipArgs = true)
 	@PostMapping("/register")
 	public ResponseEntity<?> saveUser(@RequestBody UserAccountDTO user) {
 		return ResponseEntity.ok(userDetailsService.save(user));

@@ -4,6 +4,7 @@ import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.dgsystems.kanban.entities.*;
+import com.jcabi.aspects.Loggable;
 import scala.util.Either;
 import scala.util.Right;
 
@@ -22,6 +23,7 @@ public class BoardActor extends AbstractActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
 
+    @Loggable
     @Override
     public Receive createReceive() {
         return receiveBuilder()

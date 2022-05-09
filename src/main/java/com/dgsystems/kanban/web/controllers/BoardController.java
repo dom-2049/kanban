@@ -9,6 +9,7 @@ import com.dgsystems.kanban.presenters.getBoard.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
 import com.dgsystems.kanban.web.AddCardListRequest;
 import com.dgsystems.kanban.web.AddCardRequest;
+import com.jcabi.aspects.Loggable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ public class BoardController {
 
     private final BoardRepository boardRepository;
 
+    @Loggable
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody CreateBoardRequest request) {
@@ -33,6 +35,7 @@ public class BoardController {
         createBoard.execute(request.boardName());
     }
 
+    @Loggable
     @GetMapping(value = "/{boardName}")
     public Board get(@PathVariable("boardName") String boardName) {
         com.dgsystems.kanban.usecases.GetBoard getBoard = new com.dgsystems.kanban.usecases.GetBoard(boardRepository);
@@ -42,6 +45,7 @@ public class BoardController {
         }).orElseThrow();
     }
 
+    @Loggable
     @GetMapping
     public List<GetAllBoardsOutput> getAll() {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
@@ -49,6 +53,7 @@ public class BoardController {
         return presenter.present(getAllBoards.execute());
     }
 
+    @Loggable
     @PostMapping(value = "/{boardName}/cardlist")
     @ResponseStatus(HttpStatus.CREATED)
     public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName) {
@@ -56,6 +61,7 @@ public class BoardController {
         addCardListToBoard.execute(boardName, request.cardList());
     }
 
+    @Loggable
     @PostMapping(value = "/{board}/cardlist/{cardlist}")
     @ResponseStatus(HttpStatus.CREATED)
     public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist) {
