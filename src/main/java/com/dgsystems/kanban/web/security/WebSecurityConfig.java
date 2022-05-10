@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -20,25 +19,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-	private final UserDetailsService jwtUserDetailsService;
 	private final JwtRequestFilter jwtRequestFilter;
+	private final JwtUserDetailsService jwtUserDetailsService;
 
-	public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, UserDetailsService jwtUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+	public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+							 JwtRequestFilter jwtRequestFilter,JwtUserDetailsService jwtUserDetailsService) {
 		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-		this.jwtUserDetailsService = jwtUserDetailsService;
 		this.jwtRequestFilter = jwtRequestFilter;
+		this.jwtUserDetailsService = jwtUserDetailsService;
 	}
 
 	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+	public void configureGlobal(AuthenticationManagerBuilder auth, PasswordEncoder passwordEncoder) throws Exception {
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder);
 	}
-	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-	
+
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {

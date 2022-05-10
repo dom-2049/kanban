@@ -8,6 +8,7 @@ import com.dgsystems.kanban.web.security.JwtUserDetailsService;
 import com.jcabi.aspects.LogExceptions;
 import com.jcabi.aspects.Loggable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,24 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "http://localhost:5019") //TODO: Configure cross origin once development is done
 public class AuthenticationController {
-	@Autowired
-	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+	public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Lazy JwtUserDetailsService userDetailsService) {
 		this.authenticationManager = authenticationManager;
-	}
-
-	@Autowired
-	public void setJwtTokenUtil(JwtTokenUtil jwtTokenUtil) {
 		this.jwtTokenUtil = jwtTokenUtil;
-	}
-
-	@Autowired
-	public void setUserDetailsService(JwtUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
 	}
 
-	private AuthenticationManager authenticationManager;
-	private JwtTokenUtil jwtTokenUtil;
-	private JwtUserDetailsService userDetailsService;
+	private final AuthenticationManager authenticationManager;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final JwtUserDetailsService userDetailsService;
 
 	@LogExceptions
 	@Loggable(skipArgs = true, skipResult = true)
