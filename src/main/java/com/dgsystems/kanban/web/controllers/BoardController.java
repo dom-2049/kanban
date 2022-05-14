@@ -1,7 +1,6 @@
 package com.dgsystems.kanban.web.controllers;
 
 import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.getBoard.Board;
@@ -21,11 +20,13 @@ import java.util.UUID;
 @CrossOrigin(origins = "http://localhost:5019")
 @RequestMapping("/board")
 public class BoardController {
-    public BoardController() {
-        boardRepository = new InMemoryBoardRepository();
+    private final BoardRepository boardRepository;
+
+    public BoardController(BoardRepository boardRepository) {
+
+        this.boardRepository = boardRepository;
     }
 
-    private final BoardRepository boardRepository;
 
     @Loggable
     @PostMapping
