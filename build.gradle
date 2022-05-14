@@ -24,8 +24,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-test'
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.2'
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
     implementation 'org.aspectj:aspectjrt:1.9.9.1'
     implementation 'com.jcabi:jcabi-aspects:0.23.2'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
