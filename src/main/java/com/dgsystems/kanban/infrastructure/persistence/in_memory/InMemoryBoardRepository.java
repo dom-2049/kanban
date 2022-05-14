@@ -1,4 +1,4 @@
-package com.dgsystems.kanban.infrastructure;
+package com.dgsystems.kanban.infrastructure.persistence.in_memory;
 
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.usecases.BoardRepository;

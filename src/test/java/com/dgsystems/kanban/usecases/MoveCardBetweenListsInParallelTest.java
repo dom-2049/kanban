@@ -5,7 +5,7 @@ import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
 import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

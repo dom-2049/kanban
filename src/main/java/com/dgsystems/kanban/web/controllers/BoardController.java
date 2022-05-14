@@ -1,7 +1,7 @@
 package com.dgsystems.kanban.web.controllers;
 
 import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.infrastructure.InMemoryBoardRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.getBoard.Board;

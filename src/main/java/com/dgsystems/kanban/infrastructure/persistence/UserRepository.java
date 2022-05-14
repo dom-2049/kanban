@@ -1,6 +1,6 @@
-package com.dgsystems.kanban.infrastructure;
+package com.dgsystems.kanban.infrastructure.persistence;
 
-import com.dgsystems.kanban.web.security.UserAccount;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.UserAccount;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

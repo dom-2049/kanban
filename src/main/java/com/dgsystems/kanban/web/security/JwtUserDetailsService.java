@@ -2,13 +2,12 @@ package com.dgsystems.kanban.web.security;
 
 import java.util.ArrayList;
 
-import com.dgsystems.kanban.infrastructure.UserRepository;
+import com.dgsystems.kanban.infrastructure.persistence.UserRepository;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.UserAccount;
 import com.dgsystems.kanban.web.UserAccountDTO;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

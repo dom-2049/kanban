@@ -17,13 +17,16 @@ public class AddCardListToBoard {
     }
 
     @Loggable(prepend = true)
-    public void execute(String boardName, String cardListTitle) {
+    public UUID execute(String boardName, String cardListTitle) {
         Optional<Board> optional = boardRepository.getBoard(boardName);
+        UUID id = UUID.randomUUID();
         optional.map(b -> {
             BoardManager boardManager = new BoardManager();
-            Board updated = boardManager.addCardList(b, new CardList(UUID.randomUUID(), cardListTitle, Collections.emptyList()));
+            Board updated = boardManager.addCardList(b, new CardList(id, cardListTitle, Collections.emptyList()));
             boardRepository.save(updated);
             return updated;
         }).orElseThrow();
+
+        return id;
     }
 }

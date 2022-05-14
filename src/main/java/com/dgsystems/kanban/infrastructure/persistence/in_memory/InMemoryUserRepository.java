@@ -1,6 +1,7 @@
-package com.dgsystems.kanban.infrastructure;
+package com.dgsystems.kanban.infrastructure.persistence.in_memory;
 
-import com.dgsystems.kanban.web.security.UserAccount;
+import com.dgsystems.kanban.infrastructure.persistence.UserRepository;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.UserAccount;
 
 import java.util.ArrayList;
 import java.util.List;
