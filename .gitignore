@@ -103,7 +103,5 @@ fabric.properties
 .gradle/misc.xml
 
 build/
-
-src/main/resources/application.properties
-
+.gradle/
 .idea/
