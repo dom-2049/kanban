@@ -42,10 +42,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable().authorizeRequests().antMatchers("/authenticate", "/register").permitAll()
+		httpSecurity.csrf().disable().authorizeRequests().antMatchers("/authenticate", "/register", "/swagger-ui/*", "/v3/api-docs/*", "/v3/api-docs").permitAll()
 		.anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
+
 		httpSecurity.addFilterBefore(jwtRequestFilter,  UsernamePasswordAuthenticationFilter.class);
 	}
 }
