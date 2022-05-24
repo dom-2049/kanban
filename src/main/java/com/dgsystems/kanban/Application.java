@@ -19,10 +19,6 @@ public class Application {
     }
 
     @Bean
-    public InMemoryUserRepository inMemoryUserRepository() {
-        return new InMemoryUserRepository();
-    }
-    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
