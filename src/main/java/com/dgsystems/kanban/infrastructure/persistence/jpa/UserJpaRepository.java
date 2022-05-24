@@ -18,8 +18,8 @@ public class UserJpaRepository implements UserRepository {
     @Loggable(skipArgs = true, skipResult = true)
     @Override
     public Optional<UserAccount> findByUsername(String username) {
-        Optional<UserAccount> user = Optional.of(userSpringRepository.findByUsername(username));
-        return user;
+        UserAccount user = userSpringRepository.findByUsername(username);
+        return Optional.of(user);
     }
 
     @Override
