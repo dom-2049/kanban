@@ -9,19 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,24 +71,5 @@ public class AddMemberToCardIntegrationTest {
         Card expectedCard = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.of(boardMember));
         CardList expectedCardList = new CardList(cardListId, CARD_LIST_TITLE, List.of(expectedCard));
         return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember));
-    }
-
-    @Configuration
-    @TestPropertySource("test.properties")
-    @EnableTransactionManagement
-    public class InMemoryTestConfig {
-        @Autowired
-        private Environment env;
-
-        @Bean
-        public DataSource dataSource() {
-            DriverManagerDataSource dataSource = new DriverManagerDataSource();
-            dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-            dataSource.setUrl(env.getProperty("jdbc.url"));
-            dataSource.setUsername(env.getProperty("jdbc.user"));
-            dataSource.setPassword(env.getProperty("jdbc.pass"));
-
-            return dataSource;
-        }
     }
 }
