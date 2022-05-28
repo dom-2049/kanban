@@ -34,7 +34,7 @@ public class AddBoardMemberToCardTest {
 
     @BeforeEach
     public void setup() {
-        Context.actorSystem = ActorSystem.create();
+        Context.initialize();
 
         boardRepository = new InMemoryBoardRepository();
 

@@ -14,8 +14,7 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        ActorSystem actorSystem = ActorSystem.create();
-        Context.actorSystem = actorSystem;
+        Context.initialize();
     }
 
     @Bean

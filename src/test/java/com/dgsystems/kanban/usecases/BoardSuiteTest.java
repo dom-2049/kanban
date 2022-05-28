@@ -30,7 +30,7 @@ class BoardSuiteTest {
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        Context.actorSystem = ActorSystem.create();
+        Context.initialize();
     }
 
     @Test

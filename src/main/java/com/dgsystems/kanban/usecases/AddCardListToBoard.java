@@ -1,6 +1,6 @@
 package com.dgsystems.kanban.usecases;
 
-import com.dgsystems.kanban.boundary.BoardManager;
+import com.dgsystems.kanban.boundary.BoardSession;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.CardList;
 import com.jcabi.aspects.Loggable;
@@ -21,8 +21,8 @@ public class AddCardListToBoard {
         Optional<Board> optional = boardRepository.getBoard(boardName);
         UUID id = UUID.randomUUID();
         optional.map(b -> {
-            BoardManager boardManager = new BoardManager();
-            Board updated = boardManager.addCardList(b, new CardList(id, cardListTitle, Collections.emptyList()));
+            BoardSession boardSession = new BoardSession();
+            Board updated = boardSession.addCardList(b, new CardList(id, cardListTitle, Collections.emptyList()));
             boardRepository.save(updated);
             return updated;
         }).orElseThrow();

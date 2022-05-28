@@ -8,13 +8,12 @@ import com.jcabi.aspects.Loggable;
 import scala.util.Either;
 import scala.util.Right;
 
-import java.util.Collections;
 import java.util.List;
 
-public class BoardActor extends AbstractActor {
+class BoardSessionActor extends AbstractActor {
     record Move(Card card, String from, String to, int previousHashCode) { }
     record AddCardList(CardList cardList) { }
-    record CreateBoard(String boardName, List<CardList> cardLists) { }
+    record StartBoard(String boardName, List<CardList> cardLists, List<BoardMember> members) { }
     record AddCardToCardList(String cardListTitle, Card card) { }
     record AddMemberToCard(String cardList, Card card, BoardMember boardMember) { }
     record AddMemberToBoard(BoardMember newMember) { }
@@ -39,9 +38,9 @@ public class BoardActor extends AbstractActor {
                             sender().tell(either, self());
                         })
                 .match(
-                        CreateBoard.class,
+                        StartBoard.class,
                         c -> {
-                            board = new Board(c.boardName, c.cardLists, Collections.emptyList());
+                            board = new Board(c.boardName, c.cardLists, c.members);
                             sender().tell(board, self());
                         }
                 )

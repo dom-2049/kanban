@@ -47,7 +47,7 @@ public class GetAllBoardsIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        Context.actorSystem = ActorSystem.create();
+        Context.initialize();
         boardRepository.save(new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList()));
     }
 

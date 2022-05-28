@@ -11,48 +11,48 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import static com.dgsystems.kanban.boundary.BoardActor.CreateBoard;
-import static com.dgsystems.kanban.boundary.BoardActor.AddCardList;
-import static com.dgsystems.kanban.boundary.BoardActor.Move;
-import static com.dgsystems.kanban.boundary.BoardActor.AddCardToCardList;
-import static com.dgsystems.kanban.boundary.BoardActor.AddMemberToCard;
-import static com.dgsystems.kanban.boundary.BoardActor.AddMemberToBoard;
-import static com.dgsystems.kanban.boundary.BoardActor.GetAllMembers;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.StartBoard;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.AddCardList;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.Move;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.AddCardToCardList;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.AddMemberToCard;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.AddMemberToBoard;
+import static com.dgsystems.kanban.boundary.BoardSessionActor.GetAllMembers;
 
 import static akka.pattern.Patterns.ask;
 
-public class BoardManager {
+public class BoardSession {
     public static final String WHITESPACE = " ";
     public static final String UNDERSCORE = "_";
     public static final Duration TIMEOUT = Duration.ofMillis(1000);
 
-    public Board createBoard(String boardName, List<CardList> cardLists) {
-        ActorRef boardActor = Context.actorSystem.actorOf(Props.create(BoardActor.class), boardName.replace(WHITESPACE, UNDERSCORE));
-        CreateBoard addCardList = new CreateBoard(boardName, cardLists);
+    public Board startBoard(String boardName, List<CardList> cardLists, List<BoardMember> members) {
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(boardName), TIMEOUT));
+        StartBoard addCardList = new StartBoard(boardName, cardLists, members);
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
     public Board addCardList(Board board, CardList cardList) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
         AddCardList addCardList = new AddCardList(cardList);
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
     public Either<BoardAlreadyChangedException, Board> move(Board board, Card card, String from, String to, int previousHashCode) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
         Move move = new Move(card, from, to, previousHashCode);
         return transform(ask(boardActor, move, TIMEOUT));
     }
 
     public Board addCardToCardList(Board board, String cardListTitle, Card card) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
         AddCardToCardList addCardToCardList = new AddCardToCardList(cardListTitle, card);
         return transform(ask(boardActor, addCardToCardList, TIMEOUT));
     }
 
     public Board addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddMemberToCard addMemberToCard = new BoardActor.AddMemberToCard(cardList, card, boardMember);
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
+        AddMemberToCard addMemberToCard = new BoardSessionActor.AddMemberToCard(cardList, card, boardMember);
         return transform(ask(boardActor, addMemberToCard, TIMEOUT));
     }
 
@@ -69,14 +69,14 @@ public class BoardManager {
     }
 
     public Board addMemberToBoard(Board board, BoardMember newMember) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddMemberToBoard addMemberToBoard = new BoardActor.AddMemberToBoard(newMember);
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
+        AddMemberToBoard addMemberToBoard = new BoardSessionActor.AddMemberToBoard(newMember);
         return transform(ask(boardActor, addMemberToBoard, TIMEOUT));
     }
 
     public List<BoardMember> getAllMembers(Board board) {
-        ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        GetAllMembers getAllMembers = new BoardActor.GetAllMembers();
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(board.title()), TIMEOUT));
+        GetAllMembers getAllMembers = new BoardSessionActor.GetAllMembers();
         return transform(ask(boardActor, getAllMembers, TIMEOUT));
     }
 }

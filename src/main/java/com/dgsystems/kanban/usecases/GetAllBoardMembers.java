@@ -1,6 +1,6 @@
 package com.dgsystems.kanban.usecases;
 
-import com.dgsystems.kanban.boundary.BoardManager;
+import com.dgsystems.kanban.boundary.BoardSession;
 import com.dgsystems.kanban.entities.BoardMember;
 import com.jcabi.aspects.Loggable;
 
@@ -10,6 +10,6 @@ public record GetAllBoardMembers(BoardMemberRepository boardMemberRepository, Bo
     @Loggable(prepend = true)
 
     public List<BoardMember> execute(String board) {
-        return boardRepository.getBoard(board).map(b -> new BoardManager().getAllMembers(b)).orElseThrow();
+        return boardRepository.getBoard(board).map(b -> new BoardSession().getAllMembers(b)).orElseThrow();
     }
 }
