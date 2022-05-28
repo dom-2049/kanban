@@ -14,7 +14,7 @@ public final class CardEntity {
     private String description;
     @ManyToOne
     private BoardMemberEntity boardMember;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "card_list_id")
     private CardListEntity cardList;
 

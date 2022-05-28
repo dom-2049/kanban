@@ -38,7 +38,7 @@ public class AddMemberToCardIntegrationTest {
 
     @BeforeEach
     public void setup() {
-        Context.actorSystem = ActorSystem.create();
+        Context.initialize(boardRepository);
     }
 
     @Test

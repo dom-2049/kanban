@@ -1,6 +1,5 @@
 package com.dgsystems.kanban.usecases;
 
-import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
@@ -30,7 +29,7 @@ class BoardSuiteTest {
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        Context.initialize();
+        Context.initialize(boardRepository);
     }
 
     @Test

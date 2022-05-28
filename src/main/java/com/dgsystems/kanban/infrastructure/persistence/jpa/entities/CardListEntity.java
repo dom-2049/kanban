@@ -11,10 +11,10 @@ public class CardListEntity {
     private UUID id;
     @NotEmpty
     private String title;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_title")
     private BoardEntity board;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<CardEntity> cards;
 
     public UUID id() {

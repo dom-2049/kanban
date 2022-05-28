@@ -9,7 +9,7 @@ public class BoardMemberEntity {
     @NotEmpty
     private String username;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_title")
     private BoardEntity board;
 

@@ -1,6 +1,5 @@
 package integration.database;
 
-import akka.actor.ActorSystem;
 import com.dgsystems.kanban.Application;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
@@ -13,19 +12,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +38,7 @@ public class GetAllBoardsIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        Context.initialize();
+        Context.initialize(boardRepository);
         boardRepository.save(new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList()));
     }
 

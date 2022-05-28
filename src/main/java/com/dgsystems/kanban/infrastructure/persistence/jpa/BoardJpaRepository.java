@@ -27,7 +27,10 @@ public class BoardJpaRepository implements BoardRepository {
     @Override
     public Optional<Board> getBoard(String boardName) {
         BoardEntity boardEntity = boardSpringRepository.findByTitle(boardName);
-        return Optional.of(getBoard(boardEntity));
+        if(boardEntity == null)
+            return Optional.empty();
+        else
+            return Optional.of(getBoard(boardEntity));
     }
 
     @Loggable
@@ -71,7 +74,10 @@ public class BoardJpaRepository implements BoardRepository {
     }
 
     private Board getBoard(BoardEntity b) {
-        return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()));
+        if(b != null) {
+            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()));
+        }
+        return null;
     }
 
     private List<BoardMember> getMembers(Collection<BoardMemberEntity> members) {
@@ -79,6 +85,8 @@ public class BoardJpaRepository implements BoardRepository {
     }
 
     private List<CardList> getCardLists(Collection<CardListEntity> cardListEntities) {
+        if(cardListEntities.size() == 0)
+            return Collections.emptyList();
         return cardListEntities.stream().map(this::getCardList).collect(Collectors.toList());
     }
 

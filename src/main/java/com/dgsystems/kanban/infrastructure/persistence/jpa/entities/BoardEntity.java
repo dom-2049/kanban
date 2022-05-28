@@ -8,9 +8,9 @@ public class BoardEntity {
 
     @Id
     private String title;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<CardListEntity> cardlists;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<BoardMemberEntity> members;
 
     public String title() {

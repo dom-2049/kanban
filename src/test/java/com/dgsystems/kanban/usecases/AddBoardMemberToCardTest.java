@@ -1,6 +1,5 @@
 package com.dgsystems.kanban.usecases;
 
-import akka.actor.ActorSystem;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
@@ -34,9 +33,8 @@ public class AddBoardMemberToCardTest {
 
     @BeforeEach
     public void setup() {
-        Context.initialize();
-
         boardRepository = new InMemoryBoardRepository();
+        Context.initialize(boardRepository);
 
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
