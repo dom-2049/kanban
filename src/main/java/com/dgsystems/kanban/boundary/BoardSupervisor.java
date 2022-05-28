@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BoardSupervisor extends AbstractActor {
+class BoardSupervisor extends AbstractActor {
     public static final String WHITESPACE = " ";
     public static final String UNDERSCORE = "_";
     Map<String, ActorRef> children = new HashMap<>();

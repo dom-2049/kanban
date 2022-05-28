@@ -7,7 +7,6 @@ import com.dgsystems.kanban.usecases.BoardRepository;
 
 public class Context {
     public static ActorSystem actorSystem;
-
     public static ActorRef boardSupervisor;
     public static BoardRepository boardRepository;
 
