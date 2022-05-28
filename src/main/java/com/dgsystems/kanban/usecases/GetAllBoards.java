@@ -1,5 +1,6 @@
 package com.dgsystems.kanban.usecases;
 
+import com.dgsystems.kanban.boundary.BoardSession;
 import com.dgsystems.kanban.entities.Board;
 import com.jcabi.aspects.Loggable;
 
@@ -14,6 +15,9 @@ public class GetAllBoards {
 
     @Loggable(prepend = true)
     public List<Board> execute() {
-        return boardRepository.getAll();
+        List<Board> boards = boardRepository.getAll();
+        BoardSession session = new BoardSession();
+        session.load(boards);
+        return boards;
     }
 }
