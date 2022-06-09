@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,18 +29,6 @@ class BoardSuiteTest {
     void setup() {
         boardRepository = new InMemoryBoardRepository();
         Context.initialize(boardRepository);
-    }
-
-    @Test
-    @DisplayName("Should create empty board")
-    void shouldCreateEmptyBoard() {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
-        Board expected = new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList());
-
-        createBoard.execute(BOARD_NAME);
-        Optional<Board> board = boardRepository.getBoard(BOARD_NAME);
-
-        assertThat(board).isEqualTo(Optional.of(expected));
     }
 
     @Test
