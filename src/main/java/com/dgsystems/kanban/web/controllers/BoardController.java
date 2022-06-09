@@ -1,5 +1,6 @@
 package com.dgsystems.kanban.web.controllers;
 
+import com.dgsystems.kanban.entities.BoardMember;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
@@ -33,7 +34,8 @@ public class BoardController {
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody CreateBoardRequest request) {
         CreateBoard createBoard = new CreateBoard(boardRepository);
-        createBoard.execute(request.boardName());
+        BoardMember owner = new BoardMember("owner");
+        createBoard.execute(request.boardName(), owner);
     }
 
     @Loggable
@@ -51,7 +53,7 @@ public class BoardController {
     public List<GetAllBoardsOutput> getAll() {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
-        return presenter.present(getAllBoards.execute());
+        return presenter.present(getAllBoards.execute(new BoardMember("owner")));
     }
 
     @Loggable

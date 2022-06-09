@@ -75,7 +75,7 @@ public class BoardJpaRepository implements BoardRepository {
 
     private Board getBoard(BoardEntity b) {
         if(b != null) {
-            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()));
+            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()), new BoardMember("owner"));
         }
         return null;
     }

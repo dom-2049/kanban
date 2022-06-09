@@ -1,6 +1,5 @@
 package integration.database;
 
-import akka.actor.ActorSystem;
 import com.dgsystems.kanban.Application;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
@@ -52,8 +51,9 @@ public class AddMemberToCardIntegrationTest {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(boardMemberRepository, boardRepository);
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME, owner);
         addTeamMember.execute(new BoardMember(USERNAME));
         addMemberToBoard.execute(BOARD_NAME, boardMember);
         UUID cardListId = addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
@@ -70,6 +70,6 @@ public class AddMemberToCardIntegrationTest {
     private Board expectedBoard(BoardMember boardMember, UUID cardListId) {
         Card expectedCard = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.of(boardMember));
         CardList expectedCardList = new CardList(cardListId, CARD_LIST_TITLE, List.of(expectedCard));
-        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember));
+        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember), new BoardMember("owner"));
     }
 }

@@ -8,19 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record Board(String title, List<CardList> cardLists, List<BoardMember> members) {
+public record Board(String title, List<CardList> cardLists, List<BoardMember> members, BoardMember owner) {
     public Board addCardList(CardList cardList) {
         List<CardList> newCardLists = new ArrayList<>(cardLists);
         newCardLists.add(cardList);
-        return new Board(title(), newCardLists, members);
+        return new Board(title(), newCardLists, members, new BoardMember("owner"));
     }
 
     public Board addCard(String cardListTitle, Card card) {
         return new Board(
                 title,
                 cardLists.stream().map(cl -> cl.title().equals(cardListTitle) ? cl.add(card) : cl)
-                        .collect(Collectors.toList()), members
-        );
+                        .collect(Collectors.toList()), members,
+                new BoardMember("owner"));
     }
 
     public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, int previousHashCode) {
@@ -38,7 +38,7 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
             }
         }).collect(Collectors.toList());
 
-        return Right.apply(new Board(title, cardLists, members));
+        return Right.apply(new Board(title, cardLists, members, new BoardMember("owner")));
     }
 
     public Board addMemberToCard(String cardList, Card card, BoardMember boardMember) {
@@ -58,13 +58,13 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
             }
         }).collect(Collectors.toList());
 
-        return new Board(title, cardLists, members);
+        return new Board(title, cardLists, members, new BoardMember("owner"));
     }
 
     public Board addMember(BoardMember newMember) {
         List<BoardMember> updatedMembers = new ArrayList<>(members);
         updatedMembers.add(newMember);
-        return new Board(title(), cardLists(), updatedMembers);
+        return new Board(title(), cardLists(), updatedMembers, new BoardMember("owner"));
     }
 
     public List<BoardMember> getAllMembers() {

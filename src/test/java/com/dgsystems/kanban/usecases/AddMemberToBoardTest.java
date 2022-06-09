@@ -37,6 +37,8 @@ public class AddMemberToBoardTest {
         Context.initialize(boardRepository);
 
         CreateBoard createBoard = new CreateBoard(boardRepository);
-        createBoard.execute(BOARD_NAME);
+        BoardMember owner = new BoardMember("owner");
+
+        createBoard.execute(BOARD_NAME, owner);
     }
 }

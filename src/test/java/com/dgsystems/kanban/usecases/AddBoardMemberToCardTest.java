@@ -39,8 +39,9 @@ public class AddBoardMemberToCardTest {
         CreateBoard createBoard = new CreateBoard(boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME, owner);
         addCardListToBoard.execute(BOARD_NAME, LIST_TITLE);
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);

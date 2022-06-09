@@ -40,7 +40,7 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         StartBoard.class,
                         c -> {
-                            board = new Board(c.boardName, c.cardLists, c.members);
+                            board = new Board(c.boardName, c.cardLists, c.members, new BoardMember("owner"));
                             sender().tell(board, self());
                         }
                 )

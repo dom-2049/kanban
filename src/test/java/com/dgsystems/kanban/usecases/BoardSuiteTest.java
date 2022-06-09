@@ -1,10 +1,7 @@
 package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
-import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
-import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.entities.CardList;
+import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +32,8 @@ class BoardSuiteTest {
     @DisplayName("Should add card list to board")
     void shouldAddCardListToBoard() {
         CreateBoard createBoard = new CreateBoard(boardRepository);
-        createBoard.execute(BOARD_NAME);
+        BoardMember owner = new BoardMember("owner");
+        createBoard.execute(BOARD_NAME, owner);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
@@ -49,7 +47,8 @@ class BoardSuiteTest {
     @DisplayName("Should add card to card list")
     void shouldAddCardToCardList() {
         CreateBoard createBoard = new CreateBoard(boardRepository);
-        createBoard.execute(BOARD_NAME);
+        BoardMember owner = new BoardMember("owner");
+        createBoard.execute(BOARD_NAME, owner);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
@@ -70,8 +69,9 @@ class BoardSuiteTest {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
         Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME, owner);
         MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
@@ -93,8 +93,9 @@ class BoardSuiteTest {
     void shouldGetBoard() {
         CreateBoard createBoard = new CreateBoard(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME, owner);
         Board response = getBoard.execute(BOARD_NAME).orElseThrow();
 
         assertThat(response.title()).isEqualTo(BOARD_NAME);
@@ -106,10 +107,11 @@ class BoardSuiteTest {
     void shouldGetAllBoards() {
         CreateBoard createBoard = new CreateBoard(boardRepository);
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute("work");
-        createBoard.execute("hobby");
-        List<Board> response = getAllBoards.execute();
+        createBoard.execute("work", owner);
+        createBoard.execute("hobby", owner);
+        List<Board> response = getAllBoards.execute(new BoardMember("owner"));
 
         assertThat(response).hasSize(2);
         assertThat(response.get(0).title()).isEqualTo("work");

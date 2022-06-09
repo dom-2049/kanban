@@ -3,6 +3,7 @@ package integration.database;
 import com.dgsystems.kanban.Application;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardMember;
 import com.dgsystems.kanban.entities.CardList;
 import com.dgsystems.kanban.usecases.AddCardListToBoard;
 import com.dgsystems.kanban.usecases.BoardRepository;
@@ -39,20 +40,20 @@ public class GetAllBoardsIntegrationTest {
     @BeforeAll
     public void setup() {
         Context.initialize(boardRepository);
-        boardRepository.save(new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList()));
+        boardRepository.save(new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList(), new BoardMember("owner")));
     }
 
     @Test
     @DisplayName("Should add card list to board after a get all boards")
     void shouldAddCardListToBoardAfterAGetAllBoards() {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
-        List<Board> boards = getAllBoards.execute();
+        List<Board> boards = getAllBoards.execute(new BoardMember("owner"));
         Board board = boards.get(0);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         UUID cardListId = addCardListToBoard.execute(board.title(), CARD_LIST_TITLE);
         GetBoard getBoard = new GetBoard(boardRepository);
         Optional<Board> optionalBoard = getBoard.execute(board.title());
-        Board expectedBoard = new Board(BOARD_NAME, List.of(new CardList(cardListId, CARD_LIST_TITLE, Collections.emptyList())), Collections.emptyList());
+        Board expectedBoard = new Board(BOARD_NAME, List.of(new CardList(cardListId, CARD_LIST_TITLE, Collections.emptyList())), Collections.emptyList(), new BoardMember("owner"));
         assertThat(optionalBoard.orElseThrow()).isEqualTo(expectedBoard);
     }
 }

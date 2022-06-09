@@ -3,6 +3,7 @@ package com.dgsystems.kanban.usecases;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
 import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
+import com.dgsystems.kanban.entities.BoardMember;
 import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +39,9 @@ public class MoveCardBetweenListsInParallelTest {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
+        BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME);
+        createBoard.execute(BOARD_NAME, owner);
         addCardListToBoard.execute(BOARD_NAME, TO_DO);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
         addCardListToBoard.execute(BOARD_NAME, DONE);

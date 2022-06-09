@@ -4,6 +4,7 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardMember;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ class BoardSupervisor extends AbstractActor {
 
                         Board board = Context.boardRepository
                                 .getBoard(g.boardName)
-                                .orElse(new Board(g.boardName, Collections.emptyList(), Collections.emptyList()));
+                                .orElse(new Board(g.boardName, Collections.emptyList(), Collections.emptyList(), new BoardMember("owner")));
                         boardActor.tell(new BoardSessionActor.StartBoard(board.title(), board.cardLists(), board.members()), self());
                         sender().tell(boardActor, self());
                     }
