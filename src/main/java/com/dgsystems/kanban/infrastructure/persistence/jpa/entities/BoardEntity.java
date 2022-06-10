@@ -13,8 +13,16 @@ public class BoardEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<BoardMemberEntity> members;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "username")
+    private BoardMemberEntity owner;
+
     public String title() {
         return title;
+    }
+
+    public BoardMemberEntity getOwner() {
+        return owner;
     }
 
     public Collection<CardListEntity> cardlists() {
@@ -25,11 +33,12 @@ public class BoardEntity {
         return members;
     }
 
-    public BoardEntity(String title, Collection<CardListEntity> cardlists, Collection<BoardMemberEntity> members) {
+    public BoardEntity(String title, Collection<CardListEntity> cardlists, Collection<BoardMemberEntity> members, BoardMemberEntity owner) {
         super();
         this.title = title;
         this.cardlists = cardlists;
         this.members = members;
+        this.owner = owner;
     }
 
     public BoardEntity() {

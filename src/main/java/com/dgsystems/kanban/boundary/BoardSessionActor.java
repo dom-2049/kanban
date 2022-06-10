@@ -13,7 +13,7 @@ import java.util.List;
 class BoardSessionActor extends AbstractActor {
     record Move(Card card, String from, String to, int previousHashCode) { }
     record AddCardList(CardList cardList) { }
-    record StartBoard(String boardName, List<CardList> cardLists, List<BoardMember> members) { }
+    record StartBoard(String boardName, List<CardList> cardLists, List<BoardMember> members, BoardMember owner) { }
     record AddCardToCardList(String cardListTitle, Card card) { }
     record AddMemberToCard(String cardList, Card card, BoardMember boardMember) { }
     record AddMemberToBoard(BoardMember newMember) { }
@@ -39,8 +39,8 @@ class BoardSessionActor extends AbstractActor {
                         })
                 .match(
                         StartBoard.class,
-                        c -> {
-                            board = new Board(c.boardName, c.cardLists, c.members, new BoardMember("owner"));
+                        s -> {
+                            board = new Board(s.boardName, s.cardLists, s.members, s.owner);
                             sender().tell(board, self());
                         }
                 )

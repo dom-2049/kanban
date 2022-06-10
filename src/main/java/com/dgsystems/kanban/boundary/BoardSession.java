@@ -25,9 +25,9 @@ public class BoardSession {
     public static final String UNDERSCORE = "_";
     public static final Duration TIMEOUT = Duration.ofMillis(1000);
 
-    public Board startBoard(String boardName, List<CardList> cardLists, List<BoardMember> members) {
-        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(boardName), TIMEOUT));
-        StartBoard startBoard = new StartBoard(boardName, cardLists, members);
+    public Board startBoard(String boardName, List<CardList> cardLists, List<BoardMember> members, BoardMember owner) {
+        ActorRef boardActor = transform(ask(Context.boardSupervisor, new BoardSupervisor.GetOrCreate(boardName, owner.username()), TIMEOUT));
+        StartBoard startBoard = new StartBoard(boardName, cardLists, members, owner);
         return transform(ask(boardActor, startBoard, TIMEOUT));
     }
 
@@ -80,6 +80,6 @@ public class BoardSession {
     }
 
     public void load(List<Board> boards) {
-        boards.forEach(b -> startBoard(b.title(), b.cardLists(), b.members()));
+        boards.forEach(b -> startBoard(b.title(), b.cardLists(), b.members(), b.owner()));
     }
 }

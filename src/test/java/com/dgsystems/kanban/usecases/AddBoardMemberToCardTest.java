@@ -32,20 +32,21 @@ public class AddBoardMemberToCardTest {
     }
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws OwnerDoesNotExistException {
         boardRepository = new InMemoryBoardRepository();
+        teamMemberRepository = new InMemoryBoardMemberRepository();
+
         Context.initialize(boardRepository);
 
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, teamMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         BoardMember owner = new BoardMember("owner");
-
+        teamMemberRepository.save(owner);
         createBoard.execute(BOARD_NAME, owner);
         addCardListToBoard.execute(BOARD_NAME, LIST_TITLE);
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);
-        teamMemberRepository = new InMemoryBoardMemberRepository();
         AddMemberToBoard addMemberToBoard = new AddMemberToBoard(teamMemberRepository, boardRepository);
         addMemberToBoard.execute(BOARD_NAME, new BoardMember("username"));
     }

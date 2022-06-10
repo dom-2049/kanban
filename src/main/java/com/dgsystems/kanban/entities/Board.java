@@ -12,7 +12,7 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
     public Board addCardList(CardList cardList) {
         List<CardList> newCardLists = new ArrayList<>(cardLists);
         newCardLists.add(cardList);
-        return new Board(title(), newCardLists, members, new BoardMember("owner"));
+        return new Board(title(), newCardLists, members, owner);
     }
 
     public Board addCard(String cardListTitle, Card card) {
@@ -20,7 +20,7 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
                 title,
                 cardLists.stream().map(cl -> cl.title().equals(cardListTitle) ? cl.add(card) : cl)
                         .collect(Collectors.toList()), members,
-                new BoardMember("owner"));
+                owner);
     }
 
     public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, int previousHashCode) {
@@ -38,7 +38,7 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
             }
         }).collect(Collectors.toList());
 
-        return Right.apply(new Board(title, cardLists, members, new BoardMember("owner")));
+        return Right.apply(new Board(title, cardLists, members, owner));
     }
 
     public Board addMemberToCard(String cardList, Card card, BoardMember boardMember) {
@@ -58,13 +58,13 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
             }
         }).collect(Collectors.toList());
 
-        return new Board(title, cardLists, members, new BoardMember("owner"));
+        return new Board(title, cardLists, members, owner);
     }
 
     public Board addMember(BoardMember newMember) {
         List<BoardMember> updatedMembers = new ArrayList<>(members);
         updatedMembers.add(newMember);
-        return new Board(title(), cardLists(), updatedMembers, new BoardMember("owner"));
+        return new Board(title(), cardLists(), updatedMembers, owner);
     }
 
     public List<BoardMember> getAllMembers() {

@@ -2,6 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,17 +22,20 @@ class BoardSuiteTest {
     public static final String IN_PROGRESS = "in progress";
 
     public BoardRepository boardRepository;
+    private InMemoryBoardMemberRepository boardMemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
+        boardMemberRepository = new InMemoryBoardMemberRepository();
+        boardMemberRepository.save(new BoardMember("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should add card list to board")
-    void shouldAddCardListToBoard() {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+    void shouldAddCardListToBoard() throws OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
         createBoard.execute(BOARD_NAME, owner);
 
@@ -45,8 +49,8 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should add card to card list")
-    void shouldAddCardToCardList() {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+    void shouldAddCardToCardList() throws OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
         createBoard.execute(BOARD_NAME, owner);
 
@@ -63,8 +67,8 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should move card between lists")
-    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException, OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
@@ -90,8 +94,8 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should get board")
-    void shouldGetBoard() {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+    void shouldGetBoard() throws OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
         BoardMember owner = new BoardMember("owner");
 
@@ -104,8 +108,8 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should get all boards")
-    void shouldGetAllBoards() {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+    void shouldGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         BoardMember owner = new BoardMember("owner");
 

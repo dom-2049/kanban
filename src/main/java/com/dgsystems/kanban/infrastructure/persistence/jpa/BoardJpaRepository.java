@@ -42,8 +42,8 @@ public class BoardJpaRepository implements BoardRepository {
 
     @Loggable
     @Override
-    public List<Board> getAll() {
-        Iterable<BoardEntity> boards = boardSpringRepository.findAll();
+    public List<Board> getAllForOwner(BoardMember owner) {
+        Iterable<BoardEntity> boards = boardSpringRepository.findByOwner(new BoardMemberEntity(owner.username()));
         List<Board> result = new ArrayList<>();
 
         for (BoardEntity boardEntity : boards) {
@@ -54,7 +54,7 @@ public class BoardJpaRepository implements BoardRepository {
     }
 
     private BoardEntity getBoard(Board board) {
-        return new BoardEntity(board.title(), getCardLists(board.cardLists()), getMembers(board.members()));
+        return new BoardEntity(board.title(), getCardLists(board.cardLists()), getMembers(board.members()), new BoardMemberEntity(board.owner().username()));
     }
 
     private Collection<BoardMemberEntity> getMembers(List<BoardMember> members) {
@@ -75,7 +75,7 @@ public class BoardJpaRepository implements BoardRepository {
 
     private Board getBoard(BoardEntity b) {
         if(b != null) {
-            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()), new BoardMember("owner"));
+            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()), getBoardMember(b.getOwner()));
         }
         return null;
     }

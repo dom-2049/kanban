@@ -1,10 +1,8 @@
 package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
-import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardAlreadyChangedException;
-import com.dgsystems.kanban.entities.BoardMember;
-import com.dgsystems.kanban.entities.Card;
+import com.dgsystems.kanban.entities.*;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,19 +21,22 @@ public class MoveCardBetweenListsInParallelTest {
     public static final String IN_PROGRESS = "in progress";
     public static final String DONE = "done";
     public BoardRepository boardRepository;
+    private BoardMemberRepository boardMemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
+        boardMemberRepository = new InMemoryBoardMemberRepository();
+        boardMemberRepository.save(new BoardMember("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should not execute last movement when card is moved in parallel")
-    void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException {
+    void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException, OwnerDoesNotExistException {
         Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
 
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);

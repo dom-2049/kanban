@@ -1,7 +1,9 @@
 package com.dgsystems.kanban.web.controllers;
 
 import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.BoardsDoNotBelongToOwnerException;
 import com.dgsystems.kanban.entities.Card;
+import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.getBoard.Board;
@@ -9,6 +11,7 @@ import com.dgsystems.kanban.presenters.getBoard.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
 import com.dgsystems.kanban.web.AddCardListRequest;
 import com.dgsystems.kanban.web.AddCardRequest;
+import com.dgsystems.kanban.web.security.JwtTokenUtil;
 import com.jcabi.aspects.Loggable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +20,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+//TODO: Get user from session and validate user owns board
+
 @RestController
 @CrossOrigin(origins = "http://localhost:5019")
 @RequestMapping("/board")
 public class BoardController {
     private final BoardRepository boardRepository;
+    private final BoardMemberRepository boardMemberRepository;
 
-    public BoardController(BoardRepository boardRepository) {
-
+    public BoardController(BoardRepository boardRepository, BoardMemberRepository boardMemberRepository) {
+        this.boardMemberRepository = boardMemberRepository;
         this.boardRepository = boardRepository;
     }
 
@@ -33,9 +39,16 @@ public class BoardController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody CreateBoardRequest request) {
-        CreateBoard createBoard = new CreateBoard(boardRepository);
-        BoardMember owner = new BoardMember("owner");
-        createBoard.execute(request.boardName(), owner);
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+
+
+
+        BoardMember owner = null; //boardMemberRepository.getBy(); // read from jwt token
+        try {
+            createBoard.execute(request.boardName(), owner);
+        } catch (OwnerDoesNotExistException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Loggable
@@ -53,7 +66,13 @@ public class BoardController {
     public List<GetAllBoardsOutput> getAll() {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
-        return presenter.present(getAllBoards.execute(new BoardMember("owner")));
+        try {
+            BoardMember owner = null; //boardMemberRepository.getBy(); // read from jwt token
+
+            return presenter.present(getAllBoards.execute(owner));
+        } catch (BoardsDoNotBelongToOwnerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Loggable

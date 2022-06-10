@@ -1,6 +1,7 @@
 package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardMember;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,5 +11,5 @@ public interface BoardRepository {
 
     void save(Board board);
 
-    List<Board> getAll();
+    List<Board> getAllForOwner(BoardMember owner);
 }

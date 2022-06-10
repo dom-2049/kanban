@@ -38,14 +38,15 @@ public class AddMemberToCardIntegrationTest {
     @BeforeEach
     public void setup() {
         Context.initialize(boardRepository);
+        boardMemberRepository.save(new BoardMember("owner"));
     }
 
     @Test
     @DisplayName("Should add team member to card in integration with database")
-    void shouldAddTeamMemberToCardInIntegrationWithDatabase() throws MemberNotInTeamException {
+    void shouldAddTeamMemberToCardInIntegrationWithDatabase() throws MemberNotInTeamException, OwnerDoesNotExistException {
         BoardMember boardMember = new BoardMember(USERNAME);
         Card card = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.empty());
-        CreateBoard createBoard = new CreateBoard(boardRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         AddTeamMember addTeamMember = new AddTeamMember(boardMemberRepository);
         AddMemberToBoard addMemberToBoard = new AddMemberToBoard(boardMemberRepository, boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
@@ -64,12 +65,12 @@ public class AddMemberToCardIntegrationTest {
         Board board = getBoard.execute(BOARD_NAME).orElseThrow();
 
         Board expectedBoard = expectedBoard(boardMember, cardListId);
-        assertThat(board).isEqualTo(expectedBoard);
+        assertThat(board).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedBoard);
     }
 
     private Board expectedBoard(BoardMember boardMember, UUID cardListId) {
         Card expectedCard = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.of(boardMember));
         CardList expectedCardList = new CardList(cardListId, CARD_LIST_TITLE, List.of(expectedCard));
-        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember), new BoardMember("owner"));
+        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember, new BoardMember("owner")), new BoardMember("owner"));
     }
 }
