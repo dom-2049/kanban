@@ -34,7 +34,6 @@ public class BoardController {
         this.boardRepository = boardRepository;
     }
 
-
     @Loggable
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
