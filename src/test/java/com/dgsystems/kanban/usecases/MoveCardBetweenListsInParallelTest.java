@@ -33,7 +33,7 @@ public class MoveCardBetweenListsInParallelTest {
 
     @Test
     @DisplayName("Should not execute last movement when card is moved in parallel")
-    void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException, OwnerDoesNotExistException {
+    void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException, OwnerDoesNotExistException, MemberNotInTeamException {
         Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
 
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
@@ -53,8 +53,8 @@ public class MoveCardBetweenListsInParallelTest {
 
         final CyclicBarrier gate = new CyclicBarrier(3);
 
-        Thread t1 = new Thread(new ParallelCardMove(2, card, IN_PROGRESS, TO_DO, gate, beforeExecutionBoard));
-        Thread t2 = new Thread(new ParallelCardMove(4, card, IN_PROGRESS, DONE, gate, beforeExecutionBoard));
+        Thread t1 = new Thread(new ParallelCardMove(2, card, IN_PROGRESS, TO_DO, gate, beforeExecutionBoard, owner));
+        Thread t2 = new Thread(new ParallelCardMove(4, card, IN_PROGRESS, DONE, gate, beforeExecutionBoard, owner));
 
         t1.start();
         t2.start();
@@ -78,14 +78,16 @@ public class MoveCardBetweenListsInParallelTest {
         private final String to;
         private final CyclicBarrier gate;
         private final Board beforeExecutionBoard;
+        private final BoardMember userResponsibleForOperation;
 
-        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate, Board beforeExecutionBoard) {
+        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate, Board beforeExecutionBoard, BoardMember userResponsibleForOperation) {
             this.delay = delay;
             this.card = card;
             this.from = from;
             this.to = to;
             this.gate = gate;
             this.beforeExecutionBoard = beforeExecutionBoard;
+            this.userResponsibleForOperation = userResponsibleForOperation;
         }
 
         @Override
@@ -94,7 +96,7 @@ public class MoveCardBetweenListsInParallelTest {
             try {
                 gate.await();
                 Thread.sleep(delay * 1000);
-                moveCardBetweenLists.execute(BOARD_NAME, from, to, card, beforeExecutionBoard.hashCode());
+                moveCardBetweenLists.execute(BOARD_NAME, from, to, card, beforeExecutionBoard.hashCode(), userResponsibleForOperation);
             } catch (InterruptedException | BrokenBarrierException | BoardAlreadyChangedException e) {
                 e.printStackTrace();
             }

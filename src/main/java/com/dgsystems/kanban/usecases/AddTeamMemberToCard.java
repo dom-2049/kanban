@@ -6,21 +6,23 @@ import com.dgsystems.kanban.entities.Card;
 import com.dgsystems.kanban.entities.MemberNotInTeamException;
 import com.dgsystems.kanban.entities.BoardMember;
 import com.jcabi.aspects.Loggable;
+import scala.util.Either;
+import scala.util.Left;
+import scala.util.Right;
 
 public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, BoardRepository boardRepository) {
     @Loggable(prepend = true)
-    public void execute(String boardName, String cardList, Card card, BoardMember boardMember) throws MemberNotInTeamException {
+    public BoardMember execute(String boardName, String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) throws MemberNotInTeamException {
         BoardSession boardSession = new BoardSession();
         Board board = boardRepository.getBoard(boardName).orElseThrow();
-        if (isMemberInBoard(boardMember, boardSession, board)) {
-            Board newBoard = boardSession.addMemberToCard(board, cardList, card, boardMember);
-            boardRepository.save(newBoard);
-        } else {
-            throw new MemberNotInTeamException(boardMember.username());
-        }
-    }
+        Either<MemberNotInTeamException, Board> either = boardSession.addMemberToCard(board, cardList, card, boardMember, userResponsibleForOperation);
 
-    private boolean isMemberInBoard(BoardMember boardMember, BoardSession boardSession, Board board) {
-        return boardSession.getAllMembers(board).stream().anyMatch(m -> m.username().equals(boardMember.username()));
+        if (either instanceof Left l) {
+            throw new RuntimeException((MemberNotInTeamException) l.value());
+        } else if (either instanceof Right r) {
+            Board newBoard = (Board) r.value();
+            boardRepository.save(newBoard);
+        }
+        return null;
     }
 }

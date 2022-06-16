@@ -1,9 +1,6 @@
 package com.dgsystems.kanban.web.controllers;
 
-import com.dgsystems.kanban.entities.BoardMember;
-import com.dgsystems.kanban.entities.BoardsDoNotBelongToOwnerException;
-import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
+import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.presenters.GetAllBoardsOutput;
 import com.dgsystems.kanban.presenters.GetAllBoardsPresenter;
 import com.dgsystems.kanban.presenters.getBoard.Board;
@@ -49,7 +46,7 @@ public class BoardController {
 
     @Loggable
     @GetMapping(value = "/{boardName}")
-    public Board get(@PathVariable("boardName") String boardName, Principal principal) {
+    public Board get(@PathVariable("boardName") String boardName, Principal principal) throws OwnerDoesNotExistException, MemberNotInTeamException {
         com.dgsystems.kanban.usecases.GetBoard getBoard = new com.dgsystems.kanban.usecases.GetBoard(boardRepository);
         return getBoard.execute(boardName, boardMemberRepository.getBy(principal.getName())).map(b -> {
             GetBoardPresenter presenter = new GetBoardPresenter();
@@ -73,7 +70,7 @@ public class BoardController {
     @Loggable
     @PostMapping(value = "/{boardName}/cardlist")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) {
+    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) throws MemberNotInTeamException {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
         addCardListToBoard.execute(boardName, request.cardList(), boardMember);
@@ -82,7 +79,7 @@ public class BoardController {
     @Loggable
     @PostMapping(value = "/{board}/cardlist/{cardlist}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) {
+    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws MemberNotInTeamException {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
         addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()), boardMember);

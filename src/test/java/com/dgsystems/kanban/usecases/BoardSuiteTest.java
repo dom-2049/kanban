@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class BoardSuiteTest {
 
@@ -34,7 +36,7 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should add card list to board")
-    void shouldAddCardListToBoard() throws OwnerDoesNotExistException {
+    void shouldAddCardListToBoard() throws OwnerDoesNotExistException, MemberNotInTeamException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
         Optional<BoardMember> memberOptional = Optional.of(owner);
@@ -50,7 +52,7 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should add card to card list")
-    void shouldAddCardToCardList() throws OwnerDoesNotExistException {
+    void shouldAddCardToCardList() throws OwnerDoesNotExistException, MemberNotInTeamException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
         Optional<BoardMember> memberOptional = Optional.of(owner);
@@ -69,7 +71,7 @@ class BoardSuiteTest {
 
     @Test
     @DisplayName("Should move card between lists")
-    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException, OwnerDoesNotExistException {
+    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException, OwnerDoesNotExistException, MemberNotInTeamException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
@@ -85,7 +87,7 @@ class BoardSuiteTest {
         addCardToCardList.execute(BOARD_NAME, TO_DO, card, memberOptional);
 
         Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
-        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode());
+        moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode(), owner);
 
         Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
         CardList first = board.cardLists().get(0);
@@ -93,20 +95,6 @@ class BoardSuiteTest {
 
         assertThat(first.cards()).filteredOn(c -> c.title().equals(card.title())).isEmpty();
         assertThat(second.cards()).filteredOn(c -> c.title().equals(card.title())).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Should get board")
-    void shouldGetBoard() throws OwnerDoesNotExistException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        GetBoard getBoard = new GetBoard(boardRepository);
-        BoardMember owner = new BoardMember("owner");
-
-        createBoard.execute(BOARD_NAME, Optional.of(owner));
-        Board response = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
-
-        assertThat(response.title()).isEqualTo(BOARD_NAME);
-        //TODO: validate card lists are immutable
     }
 
     @Test

@@ -31,27 +31,27 @@ public class BoardSession {
         return transform(ask(boardActor, startBoard, TIMEOUT));
     }
 
-    public Board addCardList(Board board, CardList cardList) {
+    public Either<MemberNotInTeamException, Board> addCardList(Board board, CardList cardList, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddCardList addCardList = new AddCardList(cardList);
+        AddCardList addCardList = new AddCardList(cardList, userResponsibleForOperation);
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
-    public Either<BoardAlreadyChangedException, Board> move(Board board, Card card, String from, String to, int previousHashCode) {
+    public Either<BoardAlreadyChangedException, Board> move(Board board, Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        Move move = new Move(card, from, to, previousHashCode);
+        Move move = new Move(card, from, to, previousHashCode, userResponsibleForOperation);
         return transform(ask(boardActor, move, TIMEOUT));
     }
 
-    public Board addCardToCardList(Board board, String cardListTitle, Card card) {
+    public Either<MemberNotInTeamException, Board> addCardToCardList(Board board, String cardListTitle, Card card, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddCardToCardList addCardToCardList = new AddCardToCardList(cardListTitle, card);
+        AddCardToCardList addCardToCardList = new AddCardToCardList(cardListTitle, card, userResponsibleForOperation);
         return transform(ask(boardActor, addCardToCardList, TIMEOUT));
     }
 
-    public Board addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember) {
+    public Either<MemberNotInTeamException, Board> addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddMemberToCard addMemberToCard = new BoardSessionActor.AddMemberToCard(cardList, card, boardMember);
+        AddMemberToCard addMemberToCard = new BoardSessionActor.AddMemberToCard(cardList, card, boardMember, userResponsibleForOperation);
         return transform(ask(boardActor, addMemberToCard, TIMEOUT));
     }
 
@@ -67,15 +67,15 @@ public class BoardSession {
                 .join();
     }
 
-    public Board addMemberToBoard(Board board, BoardMember newMember) {
+    public Either<MemberNotInTeamException, Board> addMemberToBoard(Board board, BoardMember newMember, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        AddMemberToBoard addMemberToBoard = new BoardSessionActor.AddMemberToBoard(newMember);
+        AddMemberToBoard addMemberToBoard = new BoardSessionActor.AddMemberToBoard(newMember, userResponsibleForOperation);
         return transform(ask(boardActor, addMemberToBoard, TIMEOUT));
     }
 
-    public List<BoardMember> getAllMembers(Board board) {
+    public Either<MemberNotInTeamException, List<BoardMember>> getAllMembers(Board board, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
-        GetAllMembers getAllMembers = new BoardSessionActor.GetAllMembers();
+        GetAllMembers getAllMembers = new BoardSessionActor.GetAllMembers(userResponsibleForOperation);
         return transform(ask(boardActor, getAllMembers, TIMEOUT));
     }
 

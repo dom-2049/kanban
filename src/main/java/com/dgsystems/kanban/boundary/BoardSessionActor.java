@@ -11,13 +11,13 @@ import scala.util.Right;
 import java.util.List;
 
 class BoardSessionActor extends AbstractActor {
-    record Move(Card card, String from, String to, int previousHashCode) { }
-    record AddCardList(CardList cardList) { }
+    record Move(Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) { }
+    record AddCardList(CardList cardList, BoardMember userResponsibleForOperation) { }
     record StartBoard(String boardName, List<CardList> cardLists, List<BoardMember> members, BoardMember owner) { }
-    record AddCardToCardList(String cardListTitle, Card card) { }
-    record AddMemberToCard(String cardList, Card card, BoardMember boardMember) { }
-    record AddMemberToBoard(BoardMember newMember) { }
-    record GetAllMembers() { }
+    record AddCardToCardList(String cardListTitle, Card card, BoardMember userResponsibleForOperation) { }
+    record AddMemberToCard(String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) { }
+    record AddMemberToBoard(BoardMember newMember, BoardMember userResponsibleForOperation) { }
+    record GetAllMembers(BoardMember userResponsibleForOperation) { }
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
@@ -29,7 +29,7 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         Move.class,
                         m -> {
-                            Either<BoardAlreadyChangedException, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode);
+                            Either<BoardAlreadyChangedException, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode, m.userResponsibleForOperation);
 
                             if (either instanceof Right right) {
                                 this.board = (Board) right.value();
@@ -47,34 +47,46 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         AddCardList.class,
                         a -> {
-                            board = board.addCardList(a.cardList());
-                            sender().tell(board, self());
+                            Either<MemberNotInTeamException, Board> either = board.addCardList(a.cardList(), a.userResponsibleForOperation);
+                            if (either instanceof Right right) {
+                                this.board = (Board) right.value();
+                            }
+                            sender().tell(either, self());
                         }
                 )
                 .match(
                         AddCardToCardList.class,
                         a -> {
-                            board = board.addCard(a.cardListTitle(), a.card());
-                            sender().tell(board, self());
+                            Either<MemberNotInTeamException, Board> either = board.addCard(a.cardListTitle(), a.card(), a.userResponsibleForOperation);
+                            if (either instanceof Right right) {
+                                this.board = (Board) right.value();
+                            }
+                            sender().tell(either, self());
                         }
                 )
                 .match(
                         AddMemberToCard.class,
                         a -> {
-                            board = board.addMemberToCard(a.cardList(), a.card(), a.boardMember());
-                            sender().tell(board, self());
+                            Either<MemberNotInTeamException, Board> either = board.addMemberToCard(a.cardList(), a.card(), a.boardMember(), a.userResponsibleForOperation);
+                            if (either instanceof Right right) {
+                                this.board = (Board) right.value();
+                            }
+                            sender().tell(either, self());
                         }
                 )
                 .match(
                         AddMemberToBoard.class,
                         a -> {
-                            board = board.addMember(a.newMember());
-                            sender().tell(board, self());
+                            Either<MemberNotInTeamException, Board> either = board.addMember(a.newMember(), a.userResponsibleForOperation);
+                            if (either instanceof Right right) {
+                                this.board = (Board) right.value();
+                            }
+                            sender().tell(either, self());
                         }
                 )
                 .match(
                         GetAllMembers.class,
-                        g -> sender().tell(board.getAllMembers(), self())
+                        g -> sender().tell(board.getAllMembers(g.userResponsibleForOperation), self())
                 )
                 .matchAny(o -> log.info("received unknown message"))
                 .build();

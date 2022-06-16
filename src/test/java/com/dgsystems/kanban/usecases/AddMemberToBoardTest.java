@@ -25,9 +25,9 @@ public class AddMemberToBoardTest {
     void shouldAddNewMemberToBoard() {
         BoardMember newMember = new BoardMember("new_member");
         AddMemberToBoard addMemberToBoard = new AddMemberToBoard(boardMemberRepository, boardRepository);
-        addMemberToBoard.execute(BOARD_NAME, newMember);
+        addMemberToBoard.execute(BOARD_NAME, newMember, owner);
 
-        List<BoardMember> members = new GetAllBoardMembers(boardMemberRepository, boardRepository).execute(BOARD_NAME);
+        List<BoardMember> members = new GetAllBoardMembers(boardMemberRepository, boardRepository).execute(BOARD_NAME, owner);
 
         assertThat(members).hasSameElementsAs(List.of(owner, newMember));
     }

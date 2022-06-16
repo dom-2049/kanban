@@ -56,10 +56,10 @@ public class AddMemberToCardIntegrationTest {
 
         createBoard.execute(BOARD_NAME, Optional.of(owner));
         addTeamMember.execute(new BoardMember(USERNAME));
-        addMemberToBoard.execute(BOARD_NAME, boardMember);
+        addMemberToBoard.execute(BOARD_NAME, boardMember, owner);
         UUID cardListId = addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, Optional.of(owner));
         addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, card, Optional.of(owner));
-        addTeamMemberToCard.execute(BOARD_NAME, CARD_LIST_TITLE, card, boardMember);
+        addTeamMemberToCard.execute(BOARD_NAME, CARD_LIST_TITLE, card, boardMember, owner);
 
         GetBoard getBoard = new GetBoard(boardRepository);
         Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();

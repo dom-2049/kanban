@@ -37,16 +37,17 @@ public class GetAllBoardsIntegrationTest {
     BoardMemberRepository boardMemberRepository;
 
     @BeforeAll
-    public void setup() {
+    public void setup() throws OwnerDoesNotExistException {
         Context.initialize(boardRepository);
         BoardMember owner = new BoardMember("owner");
         boardMemberRepository.save(owner);
-        boardRepository.save(new Board(BOARD_NAME, Collections.emptyList(), Collections.emptyList(), owner));
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        createBoard.execute(BOARD_NAME, Optional.of(owner));
     }
 
     @Test
     @DisplayName("Should add card list to board after a get all boards")
-    void shouldAddCardListToBoardAfterAGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+    void shouldAddCardListToBoardAfterAGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException, MemberNotInTeamException {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         BoardMember owner = new BoardMember("owner");
         List<Board> boards = getAllBoards.execute(Optional.of(owner));
@@ -55,7 +56,7 @@ public class GetAllBoardsIntegrationTest {
         UUID cardListId = addCardListToBoard.execute(board.title(), CARD_LIST_TITLE, Optional.of(owner));
         GetBoard getBoard = new GetBoard(boardRepository);
         Optional<Board> optionalBoard = getBoard.execute(board.title(), boardMemberRepository.getBy(owner.username()));
-        Board expectedBoard = new Board(BOARD_NAME, List.of(new CardList(cardListId, CARD_LIST_TITLE, Collections.emptyList())), Collections.emptyList(), owner);
+        Board expectedBoard = new Board(BOARD_NAME, List.of(new CardList(cardListId, CARD_LIST_TITLE, Collections.emptyList())), singletonList(owner), owner);
         assertThat(optionalBoard.orElseThrow()).isEqualTo(expectedBoard);
     }
 
