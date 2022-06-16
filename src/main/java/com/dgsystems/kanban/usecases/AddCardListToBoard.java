@@ -2,6 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.BoardSession;
 import com.dgsystems.kanban.entities.Board;
+import com.dgsystems.kanban.entities.BoardMember;
 import com.dgsystems.kanban.entities.CardList;
 import com.jcabi.aspects.Loggable;
 
@@ -17,7 +18,7 @@ public class AddCardListToBoard {
     }
 
     @Loggable(prepend = true)
-    public UUID execute(String boardName, String cardListTitle) {
+    public UUID execute(String boardName, String cardListTitle, Optional<BoardMember> boardMember) {
         Optional<Board> optional = boardRepository.getBoard(boardName);
         UUID id = UUID.randomUUID();
         optional.map(b -> {

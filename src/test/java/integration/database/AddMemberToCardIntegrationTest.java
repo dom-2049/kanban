@@ -54,15 +54,15 @@ public class AddMemberToCardIntegrationTest {
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(boardMemberRepository, boardRepository);
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME, owner);
+        createBoard.execute(BOARD_NAME, Optional.of(owner));
         addTeamMember.execute(new BoardMember(USERNAME));
         addMemberToBoard.execute(BOARD_NAME, boardMember);
-        UUID cardListId = addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
-        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, card);
+        UUID cardListId = addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, Optional.of(owner));
+        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, card, Optional.of(owner));
         addTeamMemberToCard.execute(BOARD_NAME, CARD_LIST_TITLE, card, boardMember);
 
         GetBoard getBoard = new GetBoard(boardRepository);
-        Board board = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
 
         Board expectedBoard = expectedBoard(boardMember, cardListId);
         assertThat(board).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedBoard);

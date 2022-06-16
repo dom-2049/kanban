@@ -37,10 +37,11 @@ class BoardSuiteTest {
     void shouldAddCardListToBoard() throws OwnerDoesNotExistException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
-        createBoard.execute(BOARD_NAME, owner);
+        Optional<BoardMember> memberOptional = Optional.of(owner);
+        createBoard.execute(BOARD_NAME, memberOptional);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
+        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, memberOptional);
 
         Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
         assertThat(board.cardLists()).
@@ -52,13 +53,14 @@ class BoardSuiteTest {
     void shouldAddCardToCardList() throws OwnerDoesNotExistException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
-        createBoard.execute(BOARD_NAME, owner);
+        Optional<BoardMember> memberOptional = Optional.of(owner);
+        createBoard.execute(BOARD_NAME, memberOptional);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE);
+        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, memberOptional);
 
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()));
+        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()), memberOptional);
 
         Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
 
@@ -75,16 +77,17 @@ class BoardSuiteTest {
         Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME, owner);
+        Optional<BoardMember> memberOptional = Optional.of(owner);
+        createBoard.execute(BOARD_NAME, memberOptional);
         MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);
-        addCardListToBoard.execute(BOARD_NAME, TO_DO);
-        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
-        addCardToCardList.execute(BOARD_NAME, TO_DO, card);
+        addCardListToBoard.execute(BOARD_NAME, TO_DO, memberOptional);
+        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS, memberOptional);
+        addCardToCardList.execute(BOARD_NAME, TO_DO, card, memberOptional);
 
-        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
         moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode());
 
-        Board board = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
         CardList first = board.cardLists().get(0);
         CardList second = board.cardLists().get(1);
 
@@ -99,8 +102,8 @@ class BoardSuiteTest {
         GetBoard getBoard = new GetBoard(boardRepository);
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME, owner);
-        Board response = getBoard.execute(BOARD_NAME).orElseThrow();
+        createBoard.execute(BOARD_NAME, Optional.of(owner));
+        Board response = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
 
         assertThat(response.title()).isEqualTo(BOARD_NAME);
         //TODO: validate card lists are immutable
@@ -113,9 +116,9 @@ class BoardSuiteTest {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute("work", owner);
-        createBoard.execute("hobby", owner);
-        List<Board> response = getAllBoards.execute(new BoardMember("owner"));
+        createBoard.execute("work", Optional.of(owner));
+        createBoard.execute("hobby", Optional.of(owner));
+        List<Board> response = getAllBoards.execute(Optional.of(new BoardMember("owner")));
 
         assertThat(response).hasSize(2);
         assertThat(response.get(0).title()).isEqualTo("work");

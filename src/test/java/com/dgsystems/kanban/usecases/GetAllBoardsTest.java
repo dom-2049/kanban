@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -41,12 +42,12 @@ public class GetAllBoardsTest {
         Board user2Board = new Board("user2Board", Collections.emptyList(), singletonList(user2), user2);
 
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        createBoard.execute("user1Board", user1);
-        createBoard.execute("user2Board", user2);
+        createBoard.execute("user1Board", Optional.of(user1));
+        createBoard.execute("user2Board", Optional.of(user2));
 
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
-        List<Board> boardsUser1 = getAllBoards.execute(user1);
-        List<Board> boardsUser2 = getAllBoards.execute(user2);
+        List<Board> boardsUser1 = getAllBoards.execute(Optional.of(user1));
+        List<Board> boardsUser2 = getAllBoards.execute(Optional.of(user2));
 
         assertThat(boardsUser1).isEqualTo(singletonList(user1Board));
         assertThat(boardsUser2).isEqualTo(singletonList(user2Board));

@@ -27,8 +27,9 @@ public class AddBoardMemberToCardTest {
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
         BoardMember boardMember = new BoardMember("username");
         addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, boardMember);
-        Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME).orElseThrow();
-        assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(Optional.of(boardMember));
+        Optional<BoardMember> memberOptional = Optional.of(boardMember);
+        Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME, memberOptional).orElseThrow();
+        assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(memberOptional);
     }
 
     @BeforeEach
@@ -43,10 +44,10 @@ public class AddBoardMemberToCardTest {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         BoardMember owner = new BoardMember("owner");
         teamMemberRepository.save(owner);
-        createBoard.execute(BOARD_NAME, owner);
-        addCardListToBoard.execute(BOARD_NAME, LIST_TITLE);
+        createBoard.execute(BOARD_NAME, Optional.of(owner));
+        addCardListToBoard.execute(BOARD_NAME, LIST_TITLE, Optional.of(owner));
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
-        addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card);
+        addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card, Optional.of(owner));
         AddMemberToBoard addMemberToBoard = new AddMemberToBoard(teamMemberRepository, boardRepository);
         addMemberToBoard.execute(BOARD_NAME, new BoardMember("username"));
     }

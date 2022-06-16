@@ -7,10 +7,13 @@ import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
 import com.jcabi.aspects.Loggable;
 
 import java.util.Collections;
+import java.util.Optional;
 
 public record CreateBoard(BoardRepository boardRepository, BoardMemberRepository boardMemberRepository) {
     @Loggable(prepend = true)
-    public Board execute(String boardName, BoardMember owner) throws OwnerDoesNotExistException {
+    public Board execute(String boardName, Optional<BoardMember> boardMember) throws OwnerDoesNotExistException {
+        BoardMember owner = boardMember.orElseThrow(OwnerDoesNotExistException::new);
+
         if(boardMemberRepository.getBy(owner.username()).isEmpty()) {
             throw new OwnerDoesNotExistException();
         }

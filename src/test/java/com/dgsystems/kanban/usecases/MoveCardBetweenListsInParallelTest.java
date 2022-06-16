@@ -42,13 +42,14 @@ public class MoveCardBetweenListsInParallelTest {
         GetBoard getBoard = new GetBoard(boardRepository);
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute(BOARD_NAME, owner);
-        addCardListToBoard.execute(BOARD_NAME, TO_DO);
-        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS);
-        addCardListToBoard.execute(BOARD_NAME, DONE);
-        addCardToCardList.execute(BOARD_NAME, IN_PROGRESS,card);
+        Optional<BoardMember> memberOptional = Optional.of(owner);
+        createBoard.execute(BOARD_NAME, memberOptional);
+        addCardListToBoard.execute(BOARD_NAME, TO_DO, memberOptional);
+        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS, memberOptional);
+        addCardListToBoard.execute(BOARD_NAME, DONE, memberOptional);
+        addCardToCardList.execute(BOARD_NAME, IN_PROGRESS,card, memberOptional);
 
-        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
 
         final CyclicBarrier gate = new CyclicBarrier(3);
 
@@ -63,7 +64,7 @@ public class MoveCardBetweenListsInParallelTest {
         t1.join();
         t2.join();
 
-        Board board = getBoard.execute(BOARD_NAME).orElseThrow();
+        Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
 
         assertThat(board.cardLists().get(0).cards()).isNotEmpty();
         assertThat(board.cardLists().get(1).cards()).isEmpty();

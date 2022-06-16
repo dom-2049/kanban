@@ -35,7 +35,7 @@ public class CreateBoardTest {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
         Board expected = new Board(BoardSuiteTest.BOARD_NAME, Collections.emptyList(), Collections.singletonList(owner), owner);
-        createBoard.execute(BoardSuiteTest.BOARD_NAME, owner);
+        createBoard.execute(BoardSuiteTest.BOARD_NAME, Optional.of(owner));
         Optional<Board> board = boardRepository.getBoard(BoardSuiteTest.BOARD_NAME);
 
         assertThat(board).isEqualTo(Optional.of(expected));
@@ -49,7 +49,7 @@ public class CreateBoardTest {
 
         assertThatExceptionOfType(OwnerDoesNotExistException.class)
                 .isThrownBy(() -> {
-                    createBoard.execute(BoardSuiteTest.BOARD_NAME, owner);
+                    createBoard.execute(BoardSuiteTest.BOARD_NAME, Optional.of(owner));
                 });
         assertThat(boardRepository.getBoard(BoardSuiteTest.BOARD_NAME)).isEqualTo(Optional.empty());
     }

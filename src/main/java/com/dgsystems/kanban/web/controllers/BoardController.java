@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//TODO: Get user from session and validate user owns board
-
 @RestController
 @CrossOrigin(origins = "http://localhost:5019")
 @RequestMapping("/board")
@@ -37,28 +35,23 @@ public class BoardController {
     @Loggable
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody CreateBoardRequest request, Principal principal) throws OwnerDoesNotExistException {
+    public void create(@RequestBody CreateBoardRequest request, Principal principal) {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
 
-        Optional<BoardMember> optionalOwner = boardMemberRepository.getBy(principal.getName());
+        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
 
-        if(optionalOwner.isPresent()) {
-            try {
-                createBoard.execute(request.boardName(), optionalOwner.get());
-            } catch (OwnerDoesNotExistException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            throw new OwnerDoesNotExistException();
+        try {
+            createBoard.execute(request.boardName(), boardMember);
+        } catch (OwnerDoesNotExistException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Loggable
     @GetMapping(value = "/{boardName}")
-    public Board get(@PathVariable("boardName") String boardName) {
+    public Board get(@PathVariable("boardName") String boardName, Principal principal) {
         com.dgsystems.kanban.usecases.GetBoard getBoard = new com.dgsystems.kanban.usecases.GetBoard(boardRepository);
-        return getBoard.execute(boardName).map(b -> {
+        return getBoard.execute(boardName, boardMemberRepository.getBy(principal.getName())).map(b -> {
             GetBoardPresenter presenter = new GetBoardPresenter();
             return presenter.present(b);
         }).orElseThrow();
@@ -66,14 +59,13 @@ public class BoardController {
 
     @Loggable
     @GetMapping
-    public List<GetAllBoardsOutput> getAll() {
+    public List<GetAllBoardsOutput> getAll(Principal principal) {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
         try {
-            BoardMember owner = null; //boardMemberRepository.getBy(); // read from jwt token
-
-            return presenter.present(getAllBoards.execute(owner));
-        } catch (BoardsDoNotBelongToOwnerException e) {
+            Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+            return presenter.present(getAllBoards.execute(boardMember));
+        } catch (BoardsDoNotBelongToOwnerException | OwnerDoesNotExistException e) {
             throw new RuntimeException(e);
         }
     }
@@ -81,16 +73,18 @@ public class BoardController {
     @Loggable
     @PostMapping(value = "/{boardName}/cardlist")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName) {
+    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(boardName, request.cardList());
+        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+        addCardListToBoard.execute(boardName, request.cardList(), boardMember);
     }
 
     @Loggable
     @PostMapping(value = "/{board}/cardlist/{cardlist}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist) {
+    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()));
+        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()), boardMember);
     }
 }

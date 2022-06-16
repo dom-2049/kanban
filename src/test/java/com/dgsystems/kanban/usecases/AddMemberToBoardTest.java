@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AddMemberToBoardTest {
@@ -39,6 +41,6 @@ public class AddMemberToBoardTest {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         owner = new BoardMember("owner");
         boardMemberRepository.save(owner);
-        createBoard.execute(BOARD_NAME, owner);
+        createBoard.execute(BOARD_NAME, Optional.ofNullable(owner));
     }
 }
