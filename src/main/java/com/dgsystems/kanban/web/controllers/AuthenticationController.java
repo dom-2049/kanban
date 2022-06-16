@@ -1,5 +1,9 @@
 package com.dgsystems.kanban.web.controllers;
 
+import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.UserAccount;
+import com.dgsystems.kanban.usecases.AddTeamMember;
+import com.dgsystems.kanban.usecases.BoardMemberRepository;
 import com.dgsystems.kanban.web.JwtRequest;
 import com.dgsystems.kanban.web.JwtResponse;
 import com.dgsystems.kanban.web.UserAccountDTO;
@@ -7,7 +11,6 @@ import com.dgsystems.kanban.web.security.JwtTokenUtil;
 import com.dgsystems.kanban.web.security.JwtUserDetailsService;
 import com.jcabi.aspects.LogExceptions;
 import com.jcabi.aspects.Loggable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "http://localhost:5019") //TODO: Configure cross origin once development is done
 public class AuthenticationController {
-	public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Lazy JwtUserDetailsService userDetailsService) {
+	private BoardMemberRepository boardMemberRepository;
+
+	public AuthenticationController(BoardMemberRepository boardMemberRepository, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Lazy JwtUserDetailsService userDetailsService) {
+		this.boardMemberRepository = boardMemberRepository;
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;
@@ -49,7 +55,10 @@ public class AuthenticationController {
 	@Loggable(skipResult = true, skipArgs = true)
 	@PostMapping("/register")
 	public ResponseEntity<?> saveUser(@RequestBody UserAccountDTO user) {
-		return ResponseEntity.ok(userDetailsService.save(user));
+		UserAccount save = userDetailsService.save(user);
+		AddTeamMember addTeamMember = new AddTeamMember(boardMemberRepository);
+		addTeamMember.execute(new BoardMember(user.getUsername()));
+		return ResponseEntity.ok(save);
 	}
 	
 	private void authenticate(String username, String password) throws Exception {

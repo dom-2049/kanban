@@ -11,11 +11,11 @@ import com.dgsystems.kanban.presenters.getBoard.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
 import com.dgsystems.kanban.web.AddCardListRequest;
 import com.dgsystems.kanban.web.AddCardRequest;
-import com.dgsystems.kanban.web.security.JwtTokenUtil;
 import com.jcabi.aspects.Loggable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,16 +37,20 @@ public class BoardController {
     @Loggable
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody CreateBoardRequest request) {
+    public void create(@RequestBody CreateBoardRequest request, Principal principal) throws OwnerDoesNotExistException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
 
+        Optional<BoardMember> optionalOwner = boardMemberRepository.getBy(principal.getName());
 
-
-        BoardMember owner = null; //boardMemberRepository.getBy(); // read from jwt token
-        try {
-            createBoard.execute(request.boardName(), owner);
-        } catch (OwnerDoesNotExistException e) {
-            throw new RuntimeException(e);
+        if(optionalOwner.isPresent()) {
+            try {
+                createBoard.execute(request.boardName(), optionalOwner.get());
+            } catch (OwnerDoesNotExistException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            throw new OwnerDoesNotExistException();
         }
     }
 

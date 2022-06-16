@@ -1,6 +1,7 @@
 package integration.security;
 
 import com.dgsystems.kanban.Application;
+import com.dgsystems.kanban.presenters.getBoard.Board;
 import com.dgsystems.kanban.usecases.CreateBoardRequest;
 import com.dgsystems.kanban.web.JwtRequest;
 import com.dgsystems.kanban.web.UserAccountDTO;
@@ -17,12 +18,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.function.Supplier;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,24 +82,23 @@ public class BoardControllerTest {
         String bearerToken = obtainToken(user);
         CreateBoardRequest createBoardRequest = new CreateBoardRequest("work");
 
-        mockMvc.perform(post("/board")
-                .header("Authorization", "Bearer " + bearerToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(mapper.writeValueAsString(createBoardRequest))
-        ).andExpect(status().isCreated());
+        mvcMockAuthorizedPost("/board", bearerToken, mapper.writeValueAsString(createBoardRequest), () -> status().isCreated());
+
+        MvcResult mvcResult = mockMvc.perform(get("/board/work")
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Board board = mapper.readValue(contentAsString, Board.class);
+        assertThat(board).isNotNull();
     }
 
     @Test
     @DisplayName("Give no token should be unauthorized to create board")
     void giveNoTokenShouldBeUnauthorizedToCreateBoard() throws Exception {
         CreateBoardRequest createBoardRequest = new CreateBoardRequest("work");
-
-        mockMvc.perform(post("/board")
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(mapper.writeValueAsString(createBoardRequest))
-        ).andExpect(status().isUnauthorized());
+        mvcMockPost("/board", mapper.writeValueAsString(createBoardRequest), () -> status().isUnauthorized());
     }
 
     private String obtainToken(UserAccountDTO user) throws Exception {
@@ -120,12 +125,24 @@ public class BoardControllerTest {
     }
 
     private void registerUser(UserAccountDTO user) throws Exception {
-        mockMvc.perform(
-                        post("/register").contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(user)))
-                .andExpect(status().isOk());
+        mvcMockPost("/register", mapper.writeValueAsString(user), () -> status().isOk());
+    }
+
+    private ResultActions mvcMockPost(String urlTemplate, String content, Supplier<ResultMatcher> expected) throws Exception {
+        return mockMvc.perform(post(urlTemplate).contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(expected.get());
+    }
+
+    private void mvcMockAuthorizedPost(String urlTemplate, String bearerToken, String content, Supplier<ResultMatcher> expected) throws Exception {
+        mockMvc.perform(post(urlTemplate)
+                .header("Authorization", "Bearer " + bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(content)
+        ).andExpect(expected.get());
     }
 
     @BeforeAll
