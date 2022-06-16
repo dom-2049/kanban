@@ -12,13 +12,13 @@ import scala.util.Right;
 
 public record MoveCardBetweenLists(BoardRepository boardRepository) {
     @Loggable(prepend = true)
-    public void execute(String boardName, String from, String to, Card card, int previousHashCode, BoardMember userResponsibleForOperation) throws BoardAlreadyChangedException {
+    public void execute(String boardName, String from, String to, Card card, int previousHashCode, BoardMember userResponsibleForOperation) throws Throwable {
         Board board = boardRepository.getBoard(boardName).orElseThrow();
         BoardSession boardSession = new BoardSession();
-        Either<BoardAlreadyChangedException, Board> either = boardSession.move(board, card, from, to, previousHashCode, userResponsibleForOperation);
+        Either<Throwable, Board> either = boardSession.move(board, card, from, to, previousHashCode, userResponsibleForOperation);
 
         if (either instanceof Left l) {
-            throw (BoardAlreadyChangedException) l.value();
+            throw (Throwable) l.value();
         } else if (either instanceof Right r) {
             boardRepository.save((Board) r.value());
         }

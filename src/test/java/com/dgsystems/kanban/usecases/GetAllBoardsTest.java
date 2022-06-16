@@ -7,6 +7,7 @@ import com.dgsystems.kanban.entities.BoardsDoNotBelongToOwnerException;
 import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ public class GetAllBoardsTest {
     void setup() {
         boardRepository = new InMemoryBoardRepository();
         boardMemberRepository = new InMemoryBoardMemberRepository();
+        boardMemberRepository.save(new BoardMember("owner"));
         Context.initialize(boardRepository);
     }
 
@@ -51,5 +53,21 @@ public class GetAllBoardsTest {
 
         assertThat(boardsUser1).isEqualTo(singletonList(user1Board));
         assertThat(boardsUser2).isEqualTo(singletonList(user2Board));
+    }
+
+    @Test
+    @DisplayName("Should get all boards")
+    void shouldGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+        BoardMember owner = new BoardMember("owner");
+
+        createBoard.execute("work", Optional.of(owner));
+        createBoard.execute("hobby", Optional.of(owner));
+        List<Board> response = getAllBoards.execute(Optional.of(new BoardMember("owner")));
+
+        Assertions.assertThat(response).hasSize(2);
+        Assertions.assertThat(response.get(0).title()).isEqualTo("work");
+        Assertions.assertThat(response.get(1).title()).isEqualTo("hobby");
     }
 }

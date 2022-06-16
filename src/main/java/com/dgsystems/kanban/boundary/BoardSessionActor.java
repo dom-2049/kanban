@@ -29,7 +29,7 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         Move.class,
                         m -> {
-                            Either<BoardAlreadyChangedException, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode, m.userResponsibleForOperation);
+                            Either<Throwable, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode, m.userResponsibleForOperation);
 
                             if (either instanceof Right right) {
                                 this.board = (Board) right.value();

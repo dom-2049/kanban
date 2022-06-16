@@ -37,7 +37,7 @@ public class BoardSession {
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
-    public Either<BoardAlreadyChangedException, Board> move(Board board, Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
+    public Either<Throwable, Board> move(Board board, Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         Move move = new Move(card, from, to, previousHashCode, userResponsibleForOperation);
         return transform(ask(boardActor, move, TIMEOUT));

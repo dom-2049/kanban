@@ -97,7 +97,7 @@ public class MoveCardBetweenListsInParallelTest {
                 gate.await();
                 Thread.sleep(delay * 1000);
                 moveCardBetweenLists.execute(BOARD_NAME, from, to, card, beforeExecutionBoard.hashCode(), userResponsibleForOperation);
-            } catch (InterruptedException | BrokenBarrierException | BoardAlreadyChangedException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

@@ -18,7 +18,7 @@ public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, B
         Either<MemberNotInTeamException, Board> either = boardSession.addMemberToCard(board, cardList, card, boardMember, userResponsibleForOperation);
 
         if (either instanceof Left l) {
-            throw new RuntimeException((MemberNotInTeamException) l.value());
+            throw (MemberNotInTeamException) l.value();
         } else if (either instanceof Right r) {
             Board newBoard = (Board) r.value();
             boardRepository.save(newBoard);

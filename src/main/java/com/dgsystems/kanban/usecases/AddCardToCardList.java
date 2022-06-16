@@ -15,23 +15,23 @@ import java.util.Optional;
 public record AddCardToCardList(BoardRepository boardRepository) {
     @Loggable(prepend = true)
     public void execute(String boardName, String cardListTitle, Card card, Optional<BoardMember> boardMember) throws MemberNotInTeamException {
-        if(boardMember.isEmpty()) throw new MemberNotInTeamException("");
+        if (boardMember.isEmpty()) throw new MemberNotInTeamException("");
         Optional<Board> optional = boardRepository.getBoard(boardName);
         BoardSession boardSession = new BoardSession();
-        Board board = optional
-                .map(b -> {
-                    Either<MemberNotInTeamException, Board> either = boardSession.addCardToCardList(b, cardListTitle, card, boardMember.get());
+        Board board = null;
 
-                    if(either instanceof Right r) {
-                        return (Board) r.value();
-                    }
-                    else if(either instanceof Left l) {
-                        throw new RuntimeException((MemberNotInTeamException) l.value());
-                    }
-                    return null;
-                })
-                .orElseThrow();
+        if (optional.isPresent()) {
+            Either<MemberNotInTeamException, Board> either = boardSession.addCardToCardList(optional.get(), cardListTitle, card, boardMember.get());
 
-        boardRepository.save(board);
+            if (either instanceof Right r) {
+                board = (Board) r.value();
+            } else if (either instanceof Left l) {
+                throw (MemberNotInTeamException) l.value();
+            }
+        }
+
+        if (board != null) {
+            boardRepository.save(board);
+        }
     }
 }

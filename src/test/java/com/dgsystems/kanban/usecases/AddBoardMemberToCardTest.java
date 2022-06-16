@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class AddBoardMemberToCardTest {
     public static final String BOARD_NAME = "work";
@@ -31,6 +33,15 @@ public class AddBoardMemberToCardTest {
         Optional<BoardMember> memberOptional = Optional.of(boardMember);
         Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME, memberOptional).orElseThrow();
         assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(memberOptional);
+    }
+
+    @Test
+    @DisplayName("Should not be able to add member to card when not in team")
+    void shouldNotBeAbleToAddMemberToCardWhenNotInTeam() {
+        AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
+        BoardMember boardMember = new BoardMember("username");
+        BoardMember invalidUser = new BoardMember("invalid_user");
+        assertThrows(MemberNotInTeamException.class, () -> addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, boardMember, invalidUser));
     }
 
     @BeforeEach

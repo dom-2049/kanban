@@ -34,9 +34,9 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
                 owner));
     }
 
-    public Either<BoardAlreadyChangedException, Board> move(Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
+    public Either<Throwable, Board> move(Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
         if (memberNotInMembers(userResponsibleForOperation))
-            Left.apply(new MemberNotInTeamException(userResponsibleForOperation.username()));
+            return Left.apply(new MemberNotInTeamException(userResponsibleForOperation.username()));
 
         if (previousHashCode != this.hashCode()) {
             return Left.apply(new BoardAlreadyChangedException());

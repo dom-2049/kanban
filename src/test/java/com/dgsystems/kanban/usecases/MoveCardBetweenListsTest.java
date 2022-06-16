@@ -4,6 +4,7 @@ import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class BoardSuiteTest {
+class MoveCardBetweenListsTest {
 
     public static final String BOARD_NAME = "new board";
-    public static final String CARD_LIST_TITLE = "to do";
     public static final String TO_DO = "to do";
     public static final String IN_PROGRESS = "in progress";
 
@@ -35,43 +35,8 @@ class BoardSuiteTest {
     }
 
     @Test
-    @DisplayName("Should add card list to board")
-    void shouldAddCardListToBoard() throws OwnerDoesNotExistException, MemberNotInTeamException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        BoardMember owner = new BoardMember("owner");
-        Optional<BoardMember> memberOptional = Optional.of(owner);
-        createBoard.execute(BOARD_NAME, memberOptional);
-
-        AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, memberOptional);
-
-        Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
-        assertThat(board.cardLists()).
-                filteredOn(c -> c.title().equals(CARD_LIST_TITLE)).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Should add card to card list")
-    void shouldAddCardToCardList() throws OwnerDoesNotExistException, MemberNotInTeamException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        BoardMember owner = new BoardMember("owner");
-        Optional<BoardMember> memberOptional = Optional.of(owner);
-        createBoard.execute(BOARD_NAME, memberOptional);
-
-        AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, memberOptional);
-
-        AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()), memberOptional);
-
-        Board board = boardRepository.getBoard(BOARD_NAME).orElseThrow();
-
-        assertThat(board.cardLists().get(0).cards()).filteredOn(c -> c.title().equals("card title")).isNotEmpty();
-    }
-
-    @Test
     @DisplayName("Should move card between lists")
-    void shouldMoveCardBetweenLists() throws BoardAlreadyChangedException, OwnerDoesNotExistException, MemberNotInTeamException {
+    void shouldMoveCardBetweenLists() throws Throwable {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
@@ -98,18 +63,23 @@ class BoardSuiteTest {
     }
 
     @Test
-    @DisplayName("Should get all boards")
-    void shouldGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+    @DisplayName("Should not move card when user is not in members list")
+    void shouldNotMoveCardWhenUserIsNotInMembersList() throws MemberNotInTeamException, OwnerDoesNotExistException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+        AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
+        AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
+        GetBoard getBoard = new GetBoard(boardRepository);
+        Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
         BoardMember owner = new BoardMember("owner");
 
-        createBoard.execute("work", Optional.of(owner));
-        createBoard.execute("hobby", Optional.of(owner));
-        List<Board> response = getAllBoards.execute(Optional.of(new BoardMember("owner")));
+        Optional<BoardMember> memberOptional = Optional.of(owner);
+        createBoard.execute(BOARD_NAME, memberOptional);
+        MoveCardBetweenLists moveCardFromOneListToAnother = new MoveCardBetweenLists(boardRepository);
+        addCardListToBoard.execute(BOARD_NAME, TO_DO, memberOptional);
+        addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS, memberOptional);
+        addCardToCardList.execute(BOARD_NAME, TO_DO, card, memberOptional);
 
-        assertThat(response).hasSize(2);
-        assertThat(response.get(0).title()).isEqualTo("work");
-        assertThat(response.get(1).title()).isEqualTo("hobby");
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
+        assertThrows(MemberNotInTeamException.class, () -> moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode(), new BoardMember("invalid_user")));
     }
 }

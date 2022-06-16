@@ -6,7 +6,6 @@ import com.dgsystems.kanban.entities.BoardMember;
 import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,9 +33,9 @@ public class CreateBoardTest {
     void shouldCreateEmptyBoard() throws OwnerDoesNotExistException {
         CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
         BoardMember owner = new BoardMember("owner");
-        Board expected = new Board(BoardSuiteTest.BOARD_NAME, Collections.emptyList(), Collections.singletonList(owner), owner);
-        createBoard.execute(BoardSuiteTest.BOARD_NAME, Optional.of(owner));
-        Optional<Board> board = boardRepository.getBoard(BoardSuiteTest.BOARD_NAME);
+        Board expected = new Board(MoveCardBetweenListsTest.BOARD_NAME, Collections.emptyList(), Collections.singletonList(owner), owner);
+        createBoard.execute(MoveCardBetweenListsTest.BOARD_NAME, Optional.of(owner));
+        Optional<Board> board = boardRepository.getBoard(MoveCardBetweenListsTest.BOARD_NAME);
 
         assertThat(board).isEqualTo(Optional.of(expected));
     }
@@ -49,8 +48,8 @@ public class CreateBoardTest {
 
         assertThatExceptionOfType(OwnerDoesNotExistException.class)
                 .isThrownBy(() -> {
-                    createBoard.execute(BoardSuiteTest.BOARD_NAME, Optional.of(owner));
+                    createBoard.execute(MoveCardBetweenListsTest.BOARD_NAME, Optional.of(owner));
                 });
-        assertThat(boardRepository.getBoard(BoardSuiteTest.BOARD_NAME)).isEqualTo(Optional.empty());
+        assertThat(boardRepository.getBoard(MoveCardBetweenListsTest.BOARD_NAME)).isEqualTo(Optional.empty());
     }
 }
