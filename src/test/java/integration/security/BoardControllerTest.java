@@ -22,8 +22,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.util.function.Supplier;
 
@@ -102,10 +100,6 @@ public class BoardControllerTest {
     }
 
     private String obtainToken(UserAccountDTO user) throws Exception {
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("username", user.getUsername());
-        params.add("password", user.getPassword());
-
         JwtRequest request = new JwtRequest();
         request.setUsername(user.getUsername());
         request.setPassword(user.getPassword());
