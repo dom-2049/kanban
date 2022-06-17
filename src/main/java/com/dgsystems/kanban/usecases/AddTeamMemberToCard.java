@@ -22,7 +22,9 @@ public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, B
         } else if (either instanceof Right r) {
             Board newBoard = (Board) r.value();
             boardRepository.save(newBoard);
+            return boardMember;
+        } else {
+            throw new IllegalStateException();
         }
-        return null;
     }
 }

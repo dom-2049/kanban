@@ -16,11 +16,13 @@ public record GetAllBoardMembers(BoardMemberRepository boardMemberRepository, Bo
     public List<BoardMember> execute(String board, BoardMember userResponsibleForOperation) {
         Either<MemberNotInTeamException, List<BoardMember>> either = boardRepository.getBoard(board).map(b -> new BoardSession().getAllMembers(b, userResponsibleForOperation)).orElseThrow();
 
-        if(either instanceof Left l){
+        if (either instanceof Left l) {
             throw new RuntimeException((MemberNotInTeamException) l.value());
         } else if (either instanceof Right r) {
-        return (List<BoardMember>) r.value();
+            return (List<BoardMember>) r.value();
         }
-        return null;
+        else {
+            throw new IllegalStateException();
+        }
     }
 }

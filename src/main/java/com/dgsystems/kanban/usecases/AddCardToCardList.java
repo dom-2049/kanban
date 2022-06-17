@@ -27,11 +27,11 @@ public record AddCardToCardList(BoardRepository boardRepository) {
                 board = (Board) r.value();
             } else if (either instanceof Left l) {
                 throw (MemberNotInTeamException) l.value();
+            } else {
+                throw new IllegalStateException();
             }
         }
 
-        if (board != null) {
-            boardRepository.save(board);
-        }
+        boardRepository.save(board);
     }
 }

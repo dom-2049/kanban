@@ -23,8 +23,9 @@ public record AddMemberToBoard(BoardMemberRepository boardMemberRepository, Boar
                 Board updated = (Board) r.value();
                 boardRepository.save(updated);
                 return updated;
+            } else {
+                throw new IllegalStateException();
             }
-            return null;
         }).orElseThrow();
     }
 }

@@ -36,8 +36,9 @@ public class AddCardListToBoard {
                 return updated;
             } else if (either instanceof Left l) {
                 throw new RuntimeException((MemberNotInTeamException) l.value());
+            } else {
+                throw new IllegalStateException();
             }
-            return null;
         }).orElseThrow();
 
         return id;
