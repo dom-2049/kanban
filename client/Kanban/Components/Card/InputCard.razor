@@ -1,0 +1,25 @@
+﻿@using MudBlazor
+
+<MudPaper>
+    <MudTextField Lines=2
+                  Placeholder="Enter a title for this card..."
+                  FullWidth
+                  @bind-Value=Title></MudTextField>
+</MudPaper>
+<MudButton @onclick=OnClick_>
+    Add Card
+</MudButton>
+<MudIconButton Icon=@Icons.Outlined.Clear @onclick=@(() => setOpen.InvokeAsync(false))></MudIconButton>
+
+@code {
+    [Parameter] public EventCallback<bool> setOpen { get; set; }
+
+    public string? Title { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+
+    private void OnClick_()
+    {
+        setOpen.InvokeAsync(false);
+        OnClick.InvokeAsync(Title);
+    }
+}

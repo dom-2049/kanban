@@ -10,7 +10,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
   app:
-    build: ./
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     restart: on-failure
     depends_on:
       - db
