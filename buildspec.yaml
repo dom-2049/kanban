@@ -11,13 +11,13 @@ phases:
     commands:
       # build the images
       - echo Build started on `date`
-      - docker build -t $IMAGE_REPO_NAME:kanban-client ./client/Kanban
-      - docker build -t $IMAGE_REPO_NAME:kanban-backend ./backend
-      - docker build -t $IMAGE_REPO_NAME:kanban-nginx ./nginx
+      - docker build -t dgsystems/kanban-client ./client/Kanban
+      - docker build -t dgsystems/kanban-backend ./backend
+      - docker build -t dgsystems/kanban-nginx ./nginx
   post_build:
     commands:
       # push images built in the previous step
       - echo Pushing the docker images
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-client 
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-backend
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-nginx
+      - docker push dgsystems/kanban-client 
+      - docker push dgsystems/kanban-backend
+      - docker push dgsystems/kanban-nginx
