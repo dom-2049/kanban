@@ -23,19 +23,19 @@ namespace Kanban.Services
         public async Task<Board[]> GetAllBoards()
         {
             await SetBearerToken();
-            return await httpClient.GetFromJsonAsync<Board[]>("http://localhost:8080/board") ?? new Board[0];
+            return await httpClient.GetFromJsonAsync<Board[]>("http://backend:8080/board") ?? new Board[0];
         }
 
         public async Task SaveBoard(CreateBoardRequest board)
         {
             await SetBearerToken();
-            await httpClient.PostAsJsonAsync("http://localhost:8080/board", board);
+            await httpClient.PostAsJsonAsync("http://backend:8080/board", board);
         }
 
         public async Task<Pages.Board.Model.Board> GetBoard(string boardName)
         {
             await SetBearerToken();
-            var board = await httpClient.GetFromJsonAsync<Pages.Board.Model.Board>($"http://localhost:8080/board/{boardName}");
+            var board = await httpClient.GetFromJsonAsync<Pages.Board.Model.Board>($"http://backend:8080/board/{boardName}");
             if(board == null) throw new Exception("Board not returned from service.");
             return board;
         }
@@ -43,13 +43,13 @@ namespace Kanban.Services
         public async Task AddCardList(AddCardListRequest addCardListRequest)
         {
             await SetBearerToken();
-            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist", addCardListRequest);
+            await httpClient.PostAsJsonAsync($"http://backend:8080/board/{addCardListRequest.board}/cardlist", addCardListRequest);
         }
 
         public async Task AddCard(string board, AddCardRequest addCard)
         {
             await SetBearerToken();
-            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{board}/cardlist/{addCard.cardlist}", addCard);
+            await httpClient.PostAsJsonAsync($"http://backend:8080/board/{board}/cardlist/{addCard.cardlist}", addCard);
         }
 
         private async Task SetBearerToken()

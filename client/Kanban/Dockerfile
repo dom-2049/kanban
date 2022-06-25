@@ -10,5 +10,6 @@ RUN dotnet publish Kanban.csproj -c Release -o /app/publish
 
 FROM nginx:alpine AS final
 WORKDIR /usr/share/nginx/html
+EXPOSE 3000
 COPY --from=publish /app/publish/wwwroot .
 COPY nginx.conf /etc/nginx/nginx.conf

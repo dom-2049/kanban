@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://client:3000")
 @RequestMapping("/board")
 public class BoardController {
     private final BoardRepository boardRepository;
