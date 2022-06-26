@@ -11,9 +11,9 @@ phases:
     commands:
       # build the images
       - echo Build started on `date`
-      - docker compose build
+      - docker-compose build
   post_build:
     commands:
       # push images built in the previous step
       - echo Pushing the docker images
-      - docker compose push
+      - docker-compose push
