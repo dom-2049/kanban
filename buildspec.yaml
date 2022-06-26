@@ -11,16 +11,9 @@ phases:
     commands:
       # build the images
       - echo Build started on `date`
-      - docker build -t $IMAGE_REPO_NAME:kanban-client ./client/Kanban
-      - docker tag $IMAGE_REPO_NAME:kanban-client $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-client
-      - docker build -t $IMAGE_REPO_NAME:kanban-backend ./backend
-      - docker tag $IMAGE_REPO_NAME:kanban-backend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-backend
-      - docker build -t $IMAGE_REPO_NAME:kanban-nginx ./nginx
-      - docker tag $IMAGE_REPO_NAME:kanban-nginx $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-nginx
+      - docker compose build
   post_build:
     commands:
       # push images built in the previous step
       - echo Pushing the docker images
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-client
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-backend
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:kanban-nginx
+      - docker compose push
