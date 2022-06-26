@@ -11,14 +11,14 @@ services:
     ports:
       - "88:80"
   db:
-    image: postgres
     restart: always
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgres
-    environment:
-      - POSTGRES_PASSWORD=password
+    build:
+      dockerfile: Dockerfile
+      context: ./postgres
   backend:
     build: 
       context: ./backend

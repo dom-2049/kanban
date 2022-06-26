@@ -12,14 +12,15 @@ services:
       - "88:80"
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-nginx
   db:
-    image: postgres
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-postgres
     restart: always
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgres
-    environment:
-      - POSTGRES_PASSWORD=password
+    build:
+      dockerfile: Dockerfile
+      context: ./postgres
   backend:
     build: 
       context: ./backend
