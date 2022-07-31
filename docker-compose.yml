@@ -10,9 +10,7 @@ services:
       context: ./nginx
     ports:
       - "88:80"
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-nginx
   db:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-postgres
     restart: always
     ports:
       - "5432:5432"
@@ -33,7 +31,6 @@ services:
     environment:
       - POSTGRES_PWD=password
       - JWT_SECRET=password
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-backend
   client:
     build:
       context: ./client/Kanban
@@ -43,6 +40,5 @@ services:
       - backend
     ports:
     - "3000:3000"
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:kanban-client
 volumes:
   db-data:
