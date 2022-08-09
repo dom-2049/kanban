@@ -1,6 +1,7 @@
 version: '3.1'
 services:
   nginx:
+    image: kanbancontainerregistry.azurecr.io/nginx
     depends_on:
       - client
       - backend
@@ -9,17 +10,33 @@ services:
       dockerfile: Dockerfile
       context: ./nginx
     ports:
-      - "88:80"
+      - "80:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "0.5G"
+        reservations:
+          cpus: "0.25"
+          memory: "0.1G"
   db:
+    image: kanbancontainerregistry.azurecr.io/db
     restart: always
     ports:
       - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgres
     build:
       dockerfile: Dockerfile
       context: ./postgres
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "0.5G"
+        reservations:
+          cpus: "0.25"
+          memory: "0.1G"
   backend:
+    image: kanbancontainerregistry.azurecr.io/backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -31,7 +48,16 @@ services:
     environment:
       - POSTGRES_PWD=password
       - JWT_SECRET=password
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "0.5G"
+        reservations:
+          cpus: "0.25"
+          memory: "0.1G"
   client:
+    image: kanbancontainerregistry.azurecr.io/client
     build:
       context: ./client/Kanban
       dockerfile: Dockerfile
@@ -40,5 +66,11 @@ services:
       - backend
     ports:
     - "3000:3000"
-volumes:
-  db-data:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "0.5G"
+        reservations:
+          cpus: "0.25"
+          memory: "0.1G"

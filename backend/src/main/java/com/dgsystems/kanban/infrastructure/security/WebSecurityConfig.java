@@ -1,4 +1,4 @@
-package com.dgsystems.kanban.web.security;
+package com.dgsystems.kanban.infrastructure.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

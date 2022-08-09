@@ -1,4 +1,4 @@
-package com.dgsystems.kanban.web.security;
+package com.dgsystems.kanban.infrastructure.security;
 
 import java.io.IOException;
 import java.io.Serializable;
