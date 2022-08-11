@@ -1,12 +1,11 @@
 ﻿@page "/boards"
-@using Kanban.Services
+
 @using Kanban.Components.Board
 @using Kanban.Services.CreateBoard
 @using Kanban.Services.GetAllBoards
 
 @inject CreateBoardService createBoard
 @inject GetAllBoardsService getAllBoards
-@inject KanbanApi kanbanApi
 
 @attribute [Authorize]
 
@@ -25,7 +24,7 @@ else
                 <BoardCard Title=@b.title></BoardCard>
             </MudBlazor.MudLink>
         }
-        <BoardInputContainer OnClick=@((string title) => createBoard.SaveBoard(new CreateBoardRequest(title)))></BoardInputContainer>
+        <BoardInputContainer OnClick=@(title => createBoard.SaveBoard(new CreateBoardRequest(title)))></BoardInputContainer>
     </div>
 }
 
@@ -37,5 +36,4 @@ else
         Console.WriteLine("Boards initialized!");
         boards = await getAllBoards.GetAllBoards();
     }
-
 }

@@ -1,6 +1,5 @@
 ﻿@page "/board/{BoardName}"
 
-@using Kanban.Services
 @using Kanban.Components.CardList
 @using Kanban.Services.AddCard
 @using Kanban.Services.AddCardList
@@ -14,15 +13,13 @@
 
 <div class="d-flex gap-4">
 
-    @if (board != null)
+    @foreach (var list in board.CardLists)
     {
-        foreach (var list in board.CardLists)
-        {
-            <CardList Model=@list
-              AddCard=@((string cardTitle) => addCard.AddCard(board.Title, new AddCardRequest(list.Title, cardTitle))) />
-        }
-        <CardListInputContainer AddCardList=@((string cardListTitle) => addCardList.AddCardList(new AddCardListRequest(board.Title, cardListTitle))) />
+        <CardList Model=@list
+                  AddCard=@(async cardTitle => { await addCard.AddCard(board.Title, new AddCardRequest(list.Title, cardTitle));
+                          }) />
     }
+    <CardListInputContainer AddCardList="@(cardListTitle => addCardList.AddCardList(new AddCardListRequest(board.Title, cardListTitle)))" />
 </div>
 
 @code {
