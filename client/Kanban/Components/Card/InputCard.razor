@@ -1,7 +1,7 @@
 ﻿@using MudBlazor
 
 <MudPaper>
-    <MudTextField Lines=2
+    <MudTextField Class="margin-left-right-5" Lines=2
                   Placeholder="Enter a title for this card..."
                   FullWidth
                   @bind-Value=Title></MudTextField>
@@ -10,6 +10,13 @@
     Add Card
 </MudButton>
 <MudIconButton Icon=@Icons.Outlined.Clear @onclick=@(() => setOpen.InvokeAsync(false))></MudIconButton>
+
+<style>
+    .margin-left-right-5 {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+</style>
 
 @code {
     [Parameter] public EventCallback<bool> setOpen { get; set; }

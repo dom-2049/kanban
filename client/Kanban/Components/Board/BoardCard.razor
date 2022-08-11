@@ -1,6 +1,12 @@
 ﻿@using MudBlazor
 
-<MudPaper>@Title</MudPaper>
+<style>
+    .card {
+        padding: 50px;
+    }
+</style>
+
+<MudPaper Class="card">@Title</MudPaper>
 
 @code {
         [Parameter] public string Title { get; set; }

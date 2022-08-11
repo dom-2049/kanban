@@ -2,12 +2,14 @@
 @using Kanban.Components.Card
 
 <MudPaper>
-    <Title Text=@Model.Title></Title>
+    <div class="ml-1">
+        <Title Text="@Model.Title"></Title>
+    </div>
     @foreach (var card in Model.Cards)
     {
         <Card Model=card></Card>
     }
-    <InputContainer OnClick=AddCard></InputContainer>
+    <InputContainer OnClick="AddCard"></InputContainer>
 </MudPaper>
 
 @code {

@@ -1,14 +1,21 @@
 ﻿@using MudBlazor
 
-<MudCollapse Expanded=@(open)>
+<MudCollapse Class="margin-left-right-5" Expanded=@(open)>
     <InputCard setOpen=setOpen OnClick=OnClick></InputCard>
 </MudCollapse>
-<MudCollapse Expanded=@(!open)>
+<MudCollapse Class="margin-left-right-5" Expanded=@(!open)>
     <MudPaper Elevation=0
               @onclick=@(() => setOpen(!open))>
-              <MudText>+ Add a Card</MudText>
+        <MudText>+ Add a Card</MudText>
     </MudPaper>
 </MudCollapse>
+
+<style>
+    .margin-left-right-5 {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+</style>
 
 @code {
     private bool open;
