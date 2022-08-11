@@ -12,17 +12,21 @@
 
 @if (boards == null)
 {
-    <p><em>Loading...</em></p>
+    <p>
+        <em>Loading...</em>
+    </p>
 }
 else
 {
-    @foreach (var b in boards)
-    {
-        <MudBlazor.MudLink Href="@($"/board/{b.title}")">
-            <BoardCard Title=@b.title></BoardCard>
-        </MudBlazor.MudLink>
-    }
-    <BoardInputContainer OnClick=@((string title) => createBoard.SaveBoard(new CreateBoardRequest(title)))></BoardInputContainer>
+    <div class="d-flex gap-4">
+        @foreach (var b in boards)
+        {
+            <MudBlazor.MudLink Href="@($"/board/{b.title}")">
+                <BoardCard Title=@b.title></BoardCard>
+            </MudBlazor.MudLink>
+        }
+        <BoardInputContainer OnClick=@((string title) => createBoard.SaveBoard(new CreateBoardRequest(title)))></BoardInputContainer>
+    </div>
 }
 
 @code {
@@ -33,4 +37,5 @@ else
         Console.WriteLine("Boards initialized!");
         boards = await getAllBoards.GetAllBoards();
     }
+
 }
