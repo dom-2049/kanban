@@ -1,16 +1,19 @@
 ﻿@page "/board/{BoardName}"
 
-@using Kanban.Services
 @using Kanban.Components.CardList
+@using Kanban.Pages.Board.Model
 @using Kanban.Services.AddCard
 @using Kanban.Services.AddCardList
 @using Kanban.Services.GetBoard
+@using Kanban.Services.MoveCard
+@using CardList = Kanban.Components.CardList.CardList
 
 @inject AddCardService addCard
+@inject MoveCardService moveCard
 @inject AddCardListService addCardList
 @inject GetBoardService getBoard
 
-@* @attribute [Authorize] *@
+@attribute [Authorize]
 
 <div class="d-flex gap-4">
 
@@ -19,21 +22,31 @@
         foreach (var list in board.CardLists)
         {
             <CardList Model=@list
-              AddCard=@(async (string cardTitle) => { 
-                                                  await addCard.AddCard(board.Title, new AddCardRequest(list.Title, cardTitle));
-                      }) />
+                      AddCard=@(async cardTitle => await addCard.AddCard(board.Title, new AddCardRequest(list.Title, cardTitle)))
+                      MoveCard=@(async (Card card, Direction direction) => 
+                               { 
+                                   //TODO: handle edge case
+                                   var from = board.CardLists.First(c => c.Cards.Contains(card)); 
+                                   var index = board.CardLists.IndexOf(from); 
+                                   var to = board.CardLists[index + 1]; 
+                                   await moveCard.MoveCard(board, card, from, to); 
+                               })
+                      />
         }
-        <CardListInputContainer AddCardList=@((string cardListTitle) => addCardList.AddCardList(new AddCardListRequest(board.Title, cardListTitle))) />
+        <CardListInputContainer AddCardList=@(cardListTitle => addCardList.AddCardList(new AddCardListRequest(board.Title, cardListTitle)))/>
     }
 </div>
 
 @code {
+
     [Parameter]
     public string BoardName { get; set; }
-    private Model.Board board;
+
+    private Model.Board? board;
 
     protected override async Task OnInitializedAsync()
     {
         board = await getBoard.GetBoard(BoardName);
     }
+
 }
