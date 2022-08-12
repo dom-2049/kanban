@@ -1,11 +1,20 @@
 ﻿@using MudBlazor
 
-<MudPaper Class="card">@Model?.Title</MudPaper>
+<MudPaper Class="card">
+    @Model?.Title
+    <div class="d-flex flex-end">
+        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowLeft" />
+        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowRight" />
+    </div>
+</MudPaper>
 
 <style>
     .card {
-        padding: 20px;
+        padding: 10px;
         margin: 5px;
+    }
+    .flex-end {
+        justify-content: flex-end;
     }
 </style>
 

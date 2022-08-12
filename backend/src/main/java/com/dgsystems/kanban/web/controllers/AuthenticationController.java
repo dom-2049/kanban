@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://client:3000") //TODO: Configure cross origin once development is done
+@CrossOrigin(origins = "http://localhost:5019") //TODO: Configure cross origin once development is done
 public class AuthenticationController {
 	private BoardMemberRepository boardMemberRepository;
 
