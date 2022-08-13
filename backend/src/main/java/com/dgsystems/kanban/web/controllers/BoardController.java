@@ -8,6 +8,7 @@ import com.dgsystems.kanban.presenters.getBoard.GetBoardPresenter;
 import com.dgsystems.kanban.usecases.*;
 import com.dgsystems.kanban.web.AddCardListRequest;
 import com.dgsystems.kanban.web.AddCardRequest;
+import com.dgsystems.kanban.web.MoveCardRequest;
 import com.jcabi.aspects.Loggable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,11 @@ public class BoardController {
     @Loggable
     @GetMapping(value = "/{boardName}")
     public Board get(@PathVariable("boardName") String boardName, Principal principal) throws OwnerDoesNotExistException, MemberNotInTeamException {
-        com.dgsystems.kanban.usecases.GetBoard getBoard = new com.dgsystems.kanban.usecases.GetBoard(boardRepository);
+        return getBoard(boardName, principal);
+    }
+
+    private Board getBoard(String boardName, Principal principal) throws OwnerDoesNotExistException, MemberNotInTeamException {
+        GetBoard getBoard = new GetBoard(boardRepository);
         return getBoard.execute(boardName, boardMemberRepository.getBy(principal.getName())).map(b -> {
             GetBoardPresenter presenter = new GetBoardPresenter();
             return presenter.present(b);
@@ -70,18 +75,31 @@ public class BoardController {
     @Loggable
     @PostMapping(value = "/{boardName}/cardlist")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) throws MemberNotInTeamException {
+    public Board addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) throws MemberNotInTeamException, OwnerDoesNotExistException {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
         addCardListToBoard.execute(boardName, request.cardList(), boardMember);
+        return getBoard(boardName, principal);
     }
 
     @Loggable
     @PostMapping(value = "/{board}/cardlist/{cardlist}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws MemberNotInTeamException {
+    public Board addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws MemberNotInTeamException, OwnerDoesNotExistException {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
         addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()), boardMember);
+        return getBoard(board, principal);
+    }
+
+    @Loggable
+    @PostMapping(value = "/{board}/cardlist/{cardlist}/cards/{card}/move")
+    @ResponseStatus(HttpStatus.OK)
+    public Board moveCard(@RequestBody MoveCardRequest moveCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws Throwable {
+        MoveCardBetweenLists moveCardBetweenLists = new MoveCardBetweenLists(boardRepository);
+        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+        Card card = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow();
+        moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card, moveCardRequest.boardHashCode(), boardMember.get());
+        return getBoard(board, principal);
     }
 }

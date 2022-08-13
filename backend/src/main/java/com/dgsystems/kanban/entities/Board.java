@@ -92,4 +92,8 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
 
         return Right.apply(members());
     }
+
+    public Card getCard(String card) {
+        return null;
+    }
 }

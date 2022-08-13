@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GetBoardPresenter {
-    public Board present(com.dgsystems.kanban.entities.Board boardResponse) {
-        List<CardList> cardLists = boardResponse.cardLists().stream()
+    public Board present(com.dgsystems.kanban.entities.Board board) {
+        List<CardList> cardLists = board.cardLists().stream()
                 .map(cardList ->
                         new CardList(cardList.id(),
                                 cardList.title(),
@@ -14,9 +14,10 @@ public class GetBoardPresenter {
                                         ).collect(Collectors.toList())))
                 .collect(Collectors.toList());
         return new Board(
-                boardResponse.title(),
+                board.title(),
                 cardLists,
                 cardLists.stream()
-                        .map(CardList::id).collect(Collectors.toList()));
+                        .map(CardList::id).collect(Collectors.toList()),
+                board.hashCode());
     }
 }
