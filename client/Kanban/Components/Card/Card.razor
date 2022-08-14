@@ -1,10 +1,12 @@
 ﻿@using MudBlazor
+@using Kanban.Components.CardList
+@using Direction = Kanban.Pages.Board.Model.Direction
 
 <MudPaper Class="card">
     @Model?.Title
     <div class="d-flex flex-end">
-        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowLeft" />
-        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowRight" />
+        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowLeft" OnClick="() => MoveCard.InvokeAsync(new MoveCardArgs(Model!, Direction.Left))" />
+        <MudIconButton Class="p-0" Icon="@Icons.Outlined.ArrowRight" OnClick="() => MoveCard.InvokeAsync(new MoveCardArgs(Model!, Direction.Right))"/>
     </div>
 </MudPaper>
 
@@ -21,4 +23,5 @@
 @code {
     [Parameter]
     public Pages.Board.Model.Card? Model { get; set; }
+    [Parameter] public EventCallback<MoveCardArgs> MoveCard { get; set; }
 }

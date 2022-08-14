@@ -1,4 +1,4 @@
 ﻿namespace Kanban.Pages.Board.Model
 {
-    public record CardList(string Title, List<Card> Cards);
+    public record CardList(Guid Id, string Title, List<Card> Cards);
 }

@@ -5,6 +5,7 @@ using Kanban.Services.AddCardList;
 using Kanban.Services.CreateBoard;
 using Kanban.Services.GetAllBoards;
 using Kanban.Services.GetBoard;
+using Kanban.Services.MoveCard;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -21,6 +22,8 @@ builder.Services.AddScoped<CreateBoardService>();
 builder.Services.AddScoped<GetAllBoardsService>();
 builder.Services.AddScoped<GetBoardService>();
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddSingleton<StateContainerService>();
+builder.Services.AddScoped<MoveCardService>();
 builder.Services.AddMudServices();
 
 

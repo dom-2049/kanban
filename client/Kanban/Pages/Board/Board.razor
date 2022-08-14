@@ -1,5 +1,5 @@
 ﻿@page "/board/{BoardName}"
-
+@using Microsoft.AspNetCore.Components.Web
 @using Kanban.Components.CardList
 @using Kanban.Pages.Board.Model
 @using Kanban.Services.AddCard
@@ -23,15 +23,15 @@
         {
             <CardList Model=@list
                       AddCard=@(async cardTitle => await addCard.AddCard(board.Title, new AddCardRequest(list.Title, cardTitle)))
-                      MoveCard=@(async (Card card, Direction direction) => 
-                               { 
-                                   //TODO: handle edge case
-                                   var from = board.CardLists.First(c => c.Cards.Contains(card)); 
-                                   var index = board.CardLists.IndexOf(from); 
-                                   var to = board.CardLists[index + 1]; 
-                                   await moveCard.MoveCard(board, card, from, to); 
-                               })
-                      />
+                      MoveCard=@(async args => { //TODO: handle edge case
+                                                   Model.CardList to; 
+                                                   var from = board.CardLists.First(c => c.Cards.Contains(args.card)); 
+                                                   if (args.direction == Direction.Right) { var index = board.CardLists.IndexOf(from); 
+                                                       to = board.CardLists[index + 1]; } 
+                                                   else { var index = board.CardLists.IndexOf(from); 
+                                                           to = board.CardLists[index - 1]; 
+                                                       } 
+                                                   await moveCard.MoveCard(board, args.card, from, to); })/>
         }
         <CardListInputContainer AddCardList=@(cardListTitle => addCardList.AddCardList(new AddCardListRequest(board.Title, cardListTitle)))/>
     }

@@ -61,7 +61,7 @@ public class BoardController {
 
     @Loggable
     @GetMapping
-    public List<GetAllBoardsOutput> getAll(Principal principal) {
+    public List<Board> getAll(Principal principal) {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
         try {
@@ -93,13 +93,13 @@ public class BoardController {
     }
 
     @Loggable
-    @PostMapping(value = "/{board}/cardlist/{cardlist}/cards/{card}/move")
+    @PostMapping(value = "/{board}/cardlist/{cardlist}/cards/{cardId}/move")
     @ResponseStatus(HttpStatus.OK)
-    public Board moveCard(@RequestBody MoveCardRequest moveCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws Throwable {
+    public Board moveCard(@RequestBody MoveCardRequest moveCardRequest, @PathVariable String board, @PathVariable String cardlist, @PathVariable UUID cardId, Principal principal) throws Throwable {
         MoveCardBetweenLists moveCardBetweenLists = new MoveCardBetweenLists(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
-        Card card = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow().orElseThrow();
-        moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card, moveCardRequest.boardHashCode(), boardMember.get());
+        Card card_ = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow().orElseThrow();
+        moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card_, moveCardRequest.boardHashCode(), boardMember.get());
         return getBoard(board, principal);
     }
 }

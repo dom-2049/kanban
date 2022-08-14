@@ -1,11 +1,12 @@
 ﻿using Kanban.Services.AddCard;
 using Kanban.Services.AddCardList;
 using Kanban.Services.CreateBoard;
-using Kanban.Services.GetAllBoards;
 using System.Net.Http.Json;
 using Microsoft.JSInterop;
 using System.Text.Json;
 using System.Net.Http.Headers;
+using Kanban.Pages.Board.Model;
+using Kanban.Services.MoveCard;
 
 namespace Kanban.Services;
 
@@ -13,17 +14,20 @@ public class KanbanApi
 {
     private readonly HttpClient httpClient;
     private readonly IJSRuntime jsRuntime;
+    private readonly StateContainerService _stateContainerService;
 
-    public KanbanApi(HttpClient httpClient, IJSRuntime jsRuntime)
+    public KanbanApi(HttpClient httpClient, IJSRuntime jsRuntime, StateContainerService stateContainerService)
     {
         this.jsRuntime = jsRuntime;
+        _stateContainerService = stateContainerService;
         this.httpClient = httpClient;
     }
 
     public async Task<Board[]> GetAllBoards()
     {
         await SetBearerToken();
-        return await httpClient.GetFromJsonAsync<Board[]>("http://localhost:8080/board") ?? Array.Empty<Board>();
+        return await httpClient.GetFromJsonAsync<Board[]>("http://localhost:8080/board") ??
+               Array.Empty<Board>();
     }
 
     public async Task SaveBoard(CreateBoardRequest board)
@@ -32,30 +36,56 @@ public class KanbanApi
         await httpClient.PostAsJsonAsync("http://localhost:8080/board", board);
     }
 
-    public async Task<Pages.Board.Model.Board> GetBoard(string boardName)
+    public async Task<Board> GetBoard(string boardName)
     {
         await SetBearerToken();
-        var board = await httpClient.GetFromJsonAsync<Pages.Board.Model.Board>($"http://localhost:8080/board/{boardName}");
-        if(board == null) throw new Exception("Board not returned from service.");
+        var board = await httpClient.GetFromJsonAsync<Board>($"http://localhost:8080/board/{boardName}");
+        if (board == null) throw new Exception("Board not returned from service.");
+        _stateContainerService.SetValue(board.BoardHashCode);
         return board;
     }
 
-    public async Task AddCardList(AddCardListRequest addCardListRequest)
+    public async Task<Board> AddCardList(AddCardListRequest addCardListRequest)
     {
         await SetBearerToken();
-        await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist", addCardListRequest);
+        var responseMessage =
+            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist",
+                addCardListRequest);
+        var json = await responseMessage.Content.ReadAsStringAsync();
+        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        _stateContainerService.SetValue(deserialize.BoardHashCode);
+        return deserialize;
     }
 
-    public async Task AddCard(string board, AddCardRequest addCard)
+    public async Task<Board> AddCard(string board, AddCardRequest addCard)
     {
         await SetBearerToken();
-        await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{board}/cardlist/{addCard.cardlist}", addCard);
+        var responseMessage =
+            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{board}/cardlist/{addCard.cardlist}",
+                addCard);
+        var json = await responseMessage.Content.ReadAsStringAsync();
+        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        _stateContainerService.SetValue(deserialize.BoardHashCode);
+
+        return deserialize;
+    }
+
+    public async Task<Board> MoveCard(string board, string cardlist, Guid card, MoveCardRequest moveCard)
+    {
+        await SetBearerToken();
+        var requestUri = $"http://localhost:8080/board/{board}/cardlist/{cardlist}/cards/{card}/move";
+        var responseMessage = await httpClient.PostAsJsonAsync(requestUri, moveCard);
+        var json = await responseMessage.Content.ReadAsStringAsync();
+        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        _stateContainerService.SetValue(deserialize.BoardHashCode);
+
+        return deserialize;
     }
 
     private async Task SetBearerToken()
     {
         string json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "user");
-        if(string.IsNullOrWhiteSpace(json)) return;
+        if (string.IsNullOrWhiteSpace(json)) return;
         JwtResponse? jwt = JsonSerializer.Deserialize<JwtResponse>(json);
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt?.token);
     }

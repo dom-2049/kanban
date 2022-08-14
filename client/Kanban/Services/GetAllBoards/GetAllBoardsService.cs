@@ -11,7 +11,8 @@
 
         public async Task<Board[]> GetAllBoards()
         {
-            return await kanbanApi.GetAllBoards();
+            var boards = await kanbanApi.GetAllBoards();
+            return boards.Select(b => new Board(b.Title, b.BoardHashCode)).ToArray();
         }
     }
 }

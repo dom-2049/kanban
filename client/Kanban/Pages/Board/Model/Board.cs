@@ -1,4 +1,4 @@
 ﻿namespace Kanban.Pages.Board.Model
 {
-    public record Board(string Title, List<CardList> CardLists, List<Guid> ListIds);
+    public record Board(string Title, List<CardList> CardLists, List<Guid> CardListsIds, int BoardHashCode);
 }

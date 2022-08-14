@@ -7,7 +7,7 @@
     </div>
     @foreach (var card in Model.Cards)
     {
-        <Card Model=card></Card>
+        <Card Model=card MoveCard="MoveCard"></Card>
     }
     <InputContainer OnClick="AddCard"></InputContainer>
 </MudPaper>
@@ -16,5 +16,5 @@
     [Parameter]
     public Pages.Board.Model.CardList Model { get; set; }
     [Parameter] public EventCallback<string> AddCard { get; set; }
-    [Parameter] public EventCallback<string> MoveCard { get; set; }
+    [Parameter] public EventCallback<MoveCardArgs> MoveCard { get; set; }
 }
