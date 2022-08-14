@@ -15,16 +15,8 @@ public record AddTeamMemberToCard(BoardMemberRepository boardMemberRepository, B
     public BoardMember execute(String boardName, String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) throws MemberNotInTeamException {
         BoardSession boardSession = new BoardSession();
         Board board = boardRepository.getBoard(boardName).orElseThrow();
-        Either<MemberNotInTeamException, Board> either = boardSession.addMemberToCard(board, cardList, card, boardMember, userResponsibleForOperation);
-
-        if (either instanceof Left l) {
-            throw (MemberNotInTeamException) l.value();
-        } else if (either instanceof Right r) {
-            Board newBoard = (Board) r.value();
-            boardRepository.save(newBoard);
+        Board either = boardSession.addMemberToCard(board, cardList, card, boardMember, userResponsibleForOperation);
+            boardRepository.save(either);
             return boardMember;
-        } else {
-            throw new IllegalStateException();
-        }
     }
 }

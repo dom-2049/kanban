@@ -18,20 +18,11 @@ public record AddCardToCardList(BoardRepository boardRepository) {
         if (boardMember.isEmpty()) throw new MemberNotInTeamException("");
         Optional<Board> optional = boardRepository.getBoard(boardName);
         BoardSession boardSession = new BoardSession();
-        Board board = null;
 
-        if (optional.isPresent()) {
-            Either<MemberNotInTeamException, Board> either = boardSession.addCardToCardList(optional.get(), cardListTitle, card, boardMember.get());
-
-            if (either instanceof Right r) {
-                board = (Board) r.value();
-            } else if (either instanceof Left l) {
-                throw (MemberNotInTeamException) l.value();
-            } else {
-                throw new IllegalStateException();
-            }
-        }
-
-        boardRepository.save(board);
+        optional.map(b -> {
+            Board updated = boardSession.addCardToCardList(b, cardListTitle, card, boardMember.get());
+            boardRepository.save(updated);
+            return null;
+        });
     }
 }

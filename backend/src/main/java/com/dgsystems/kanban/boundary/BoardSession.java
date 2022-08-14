@@ -31,25 +31,25 @@ public class BoardSession {
         return transform(ask(boardActor, startBoard, TIMEOUT));
     }
 
-    public Either<MemberNotInTeamException, Board> addCardList(Board board, CardList cardList, BoardMember userResponsibleForOperation) {
+    public Board addCardList(Board board, CardList cardList, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         AddCardList addCardList = new AddCardList(cardList, userResponsibleForOperation);
         return transform(ask(boardActor, addCardList, TIMEOUT));
     }
 
-    public Either<Throwable, Board> move(Board board, Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
+    public Board move(Board board, Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         Move move = new Move(card, from, to, previousHashCode, userResponsibleForOperation);
         return transform(ask(boardActor, move, TIMEOUT));
     }
 
-    public Either<MemberNotInTeamException, Board> addCardToCardList(Board board, String cardListTitle, Card card, BoardMember userResponsibleForOperation) {
+    public Board addCardToCardList(Board board, String cardListTitle, Card card, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         AddCardToCardList addCardToCardList = new AddCardToCardList(cardListTitle, card, userResponsibleForOperation);
         return transform(ask(boardActor, addCardToCardList, TIMEOUT));
     }
 
-    public Either<MemberNotInTeamException, Board> addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) {
+    public Board addMemberToCard(Board board, String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         AddMemberToCard addMemberToCard = new BoardSessionActor.AddMemberToCard(cardList, card, boardMember, userResponsibleForOperation);
         return transform(ask(boardActor, addMemberToCard, TIMEOUT));
@@ -67,7 +67,7 @@ public class BoardSession {
                 .join();
     }
 
-    public Either<MemberNotInTeamException, Board> addMemberToBoard(Board board, BoardMember newMember, BoardMember userResponsibleForOperation) {
+    public Board addMemberToBoard(Board board, BoardMember newMember, BoardMember userResponsibleForOperation) {
         ActorSelection boardActor = Context.actorSystem.actorSelection(actorPath(board));
         AddMemberToBoard addMemberToBoard = new BoardSessionActor.AddMemberToBoard(newMember, userResponsibleForOperation);
         return transform(ask(boardActor, addMemberToBoard, TIMEOUT));

@@ -29,13 +29,13 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         Move.class,
                         m -> {
-                            Either<Throwable, Board> either = board.move(m.card, m.from, m.to, m.previousHashCode, m.userResponsibleForOperation);
-
-                            if (either instanceof Right right) {
-                                this.board = (Board) right.value();
+                            try {
+                                this.board = board.move(m.card, m.from, m.to, m.previousHashCode, m.userResponsibleForOperation);
+                            } catch (MemberNotInTeamException | BoardAlreadyChangedException e) {
+                                throw new RuntimeException(e);
                             }
 
-                            sender().tell(either, self());
+                            sender().tell(this.board, self());
                         })
                 .match(
                         StartBoard.class,
@@ -47,41 +47,46 @@ class BoardSessionActor extends AbstractActor {
                 .match(
                         AddCardList.class,
                         a -> {
-                            Either<MemberNotInTeamException, Board> either = board.addCardList(a.cardList(), a.userResponsibleForOperation);
-                            if (either instanceof Right right) {
-                                this.board = (Board) right.value();
+                            try {
+                                this.board = board.addCardList(a.cardList(), a.userResponsibleForOperation);
+                            } catch (MemberNotInTeamException e) {
+                                throw new RuntimeException(e);
                             }
-                            sender().tell(either, self());
+
+                            sender().tell(this.board, self());
                         }
                 )
                 .match(
                         AddCardToCardList.class,
                         a -> {
-                            Either<MemberNotInTeamException, Board> either = board.addCard(a.cardListTitle(), a.card(), a.userResponsibleForOperation);
-                            if (either instanceof Right right) {
-                                this.board = (Board) right.value();
+                            try {
+                                this.board = board.addCard(a.cardListTitle(), a.card(), a.userResponsibleForOperation);
+                            } catch (MemberNotInTeamException e) {
+                                throw new RuntimeException(e);
                             }
-                            sender().tell(either, self());
+                            sender().tell(board, self());
                         }
                 )
                 .match(
                         AddMemberToCard.class,
                         a -> {
-                            Either<MemberNotInTeamException, Board> either = board.addMemberToCard(a.cardList(), a.card(), a.boardMember(), a.userResponsibleForOperation);
-                            if (either instanceof Right right) {
-                                this.board = (Board) right.value();
+                            try {
+                                this.board = board.addMemberToCard(a.cardList(), a.card(), a.boardMember(), a.userResponsibleForOperation);
+                            } catch (MemberNotInTeamException e) {
+                                throw new RuntimeException(e);
                             }
-                            sender().tell(either, self());
+                            sender().tell(this.board, self());
                         }
                 )
                 .match(
                         AddMemberToBoard.class,
                         a -> {
-                            Either<MemberNotInTeamException, Board> either = board.addMember(a.newMember(), a.userResponsibleForOperation);
-                            if (either instanceof Right right) {
-                                this.board = (Board) right.value();
+                            try {
+                                this.board = board.addMember(a.newMember(), a.userResponsibleForOperation);
+                            } catch (MemberNotInTeamException e) {
+                                throw new RuntimeException(e);
                             }
-                            sender().tell(either, self());
+                            sender().tell(this.board, self());
                         }
                 )
                 .match(

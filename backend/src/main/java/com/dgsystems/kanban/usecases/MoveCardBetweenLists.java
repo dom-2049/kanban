@@ -15,12 +15,7 @@ public record MoveCardBetweenLists(BoardRepository boardRepository) {
     public void execute(String boardName, String from, String to, Card card, int previousHashCode, BoardMember userResponsibleForOperation) throws Throwable {
         Board board = boardRepository.getBoard(boardName).orElseThrow();
         BoardSession boardSession = new BoardSession();
-        Either<Throwable, Board> either = boardSession.move(board, card, from, to, previousHashCode, userResponsibleForOperation);
-
-        if (either instanceof Left l) {
-            throw (Throwable) l.value();
-        } else if (either instanceof Right r) {
-            boardRepository.save((Board) r.value());
-        }
+        Board either = boardSession.move(board, card, from, to, previousHashCode, userResponsibleForOperation);
+            boardRepository.save(either);
     }
 }

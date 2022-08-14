@@ -98,7 +98,7 @@ public class BoardController {
     public Board moveCard(@RequestBody MoveCardRequest moveCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws Throwable {
         MoveCardBetweenLists moveCardBetweenLists = new MoveCardBetweenLists(boardRepository);
         Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
-        Card card = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow();
+        Card card = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow().orElseThrow();
         moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card, moveCardRequest.boardHashCode(), boardMember.get());
         return getBoard(board, principal);
     }

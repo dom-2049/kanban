@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,6 +62,7 @@ public class AddCardToCardListTest {
 
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         Optional<BoardMember> invalidUser = Optional.of(new BoardMember("invalid_user"));
-        assertThrows(MemberNotInTeamException.class, () -> addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()), invalidUser));
+        assertThrows(CompletionException.class, () -> addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()), invalidUser));
+        //TODO: assert card is not added
     }
 }

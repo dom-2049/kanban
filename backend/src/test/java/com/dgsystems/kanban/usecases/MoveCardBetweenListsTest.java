@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -80,6 +81,7 @@ class MoveCardBetweenListsTest {
         addCardToCardList.execute(BOARD_NAME, TO_DO, card, memberOptional);
 
         Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
-        assertThrows(MemberNotInTeamException.class, () -> moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode(), new BoardMember("invalid_user")));
+        assertThrows(CompletionException.class, () -> moveCardFromOneListToAnother.execute(BOARD_NAME, TO_DO, IN_PROGRESS, card, beforeExecutionBoard.hashCode(), new BoardMember("invalid_user")));
+        //TODO: assert card is not moved
     }
 }

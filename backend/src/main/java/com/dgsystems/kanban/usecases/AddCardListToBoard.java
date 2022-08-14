@@ -28,18 +28,10 @@ public class AddCardListToBoard {
         UUID id = UUID.randomUUID();
         optional.map(b -> {
             BoardSession boardSession = new BoardSession();
-            Either<MemberNotInTeamException, Board> either = boardSession.addCardList(b, new CardList(id, cardListTitle, Collections.emptyList()), boardMember.get());
-
-            if (either instanceof Right r) {
-                Board updated = (Board) r.value();
-                boardRepository.save(updated);
-                return updated;
-            } else if (either instanceof Left l) {
-                throw new RuntimeException((MemberNotInTeamException) l.value());
-            } else {
-                throw new IllegalStateException();
-            }
-        }).orElseThrow();
+            Board board = boardSession.addCardList(b, new CardList(id, cardListTitle, Collections.emptyList()), boardMember.get());
+            boardRepository.save(board);
+            return board;
+        });
 
         return id;
     }

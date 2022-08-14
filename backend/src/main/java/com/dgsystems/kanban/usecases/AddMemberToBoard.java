@@ -15,17 +15,9 @@ public record AddMemberToBoard(BoardMemberRepository boardMemberRepository, Boar
     public void execute(String boardName, BoardMember newMember, BoardMember userResponsibleForOperation) {
         boardRepository.getBoard(boardName).map(board -> {
             BoardSession boardSession = new BoardSession();
-            Either<MemberNotInTeamException, Board> either = boardSession.addMemberToBoard(board, newMember, userResponsibleForOperation);
-
-            if (either instanceof Left l) {
-                throw new RuntimeException((MemberNotInTeamException) l.value());
-            } else if (either instanceof Right r) {
-                Board updated = (Board) r.value();
-                boardRepository.save(updated);
-                return updated;
-            } else {
-                throw new IllegalStateException();
-            }
-        }).orElseThrow();
+            Board board1 = boardSession.addMemberToBoard(board, newMember, userResponsibleForOperation);
+            boardRepository.save(board1);
+            return board1;
+        });
     }
 }
