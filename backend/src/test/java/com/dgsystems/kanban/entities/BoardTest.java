@@ -2,7 +2,6 @@ package com.dgsystems.kanban.entities;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import scala.util.Either;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +20,7 @@ public class BoardTest {
                 .addCardList(new CardList(UUID.randomUUID(), "to do", Collections.emptyList()), owner)
                 .addCard("to do", expected, owner);
 
-        Card actual = board.getCard("dishes").orElseThrow();
+        Card actual = board.getCard(expected.id()).orElseThrow();
         assertThat(actual).isEqualTo(expected);
     }
 }

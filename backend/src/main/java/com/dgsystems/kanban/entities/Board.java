@@ -4,10 +4,7 @@ import scala.util.Either;
 import scala.util.Left;
 import scala.util.Right;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,11 +92,11 @@ public record Board(String title, List<CardList> cardLists, List<BoardMember> me
         return Right.apply(members());
     }
 
-    public Optional<Card> getCard(String card) {
+    public Optional<Card> getCard(UUID cardId) {
         return cardLists()
                 .stream()
                 .flatMap(cardList -> cardList.cards().stream())
-                .filter(c -> c.title().equals(card))
+                .filter(c -> c.id().equals(cardId))
                 .findFirst();
     }
 }

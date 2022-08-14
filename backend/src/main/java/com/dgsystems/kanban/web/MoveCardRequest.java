@@ -1,4 +1,6 @@
 package com.dgsystems.kanban.web;
 
-public record MoveCardRequest(String from, String to, String card, int boardHashCode) {
+import java.util.UUID;
+
+public record MoveCardRequest(String from, String to, UUID card, int boardHashCode) {
 }
