@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MoveCardBetweenListsIntegrationTest {
     private static final String USERNAME = UUID.randomUUID().toString();
     private static final String BOARD_NAME = UUID.randomUUID().toString();
-    private static final String CARD_LIST_TITLE = UUID.randomUUID().toString();
     private static final String DO_THE_DISHES = "do the dishes";
     private static final UUID CARD_ID = UUID.randomUUID();
 
