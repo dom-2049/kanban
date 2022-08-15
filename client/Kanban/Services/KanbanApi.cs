@@ -15,6 +15,10 @@ public class KanbanApi
     private readonly HttpClient httpClient;
     private readonly IJSRuntime jsRuntime;
     private readonly StateContainerService _stateContainerService;
+    private JsonSerializerOptions options = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public KanbanApi(HttpClient httpClient, IJSRuntime jsRuntime, StateContainerService stateContainerService)
     {
@@ -48,11 +52,9 @@ public class KanbanApi
     public async Task<Board> AddCardList(AddCardListRequest addCardListRequest)
     {
         await SetBearerToken();
-        var responseMessage =
-            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist",
-                addCardListRequest);
+        var responseMessage = await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist", addCardListRequest);
         var json = await responseMessage.Content.ReadAsStringAsync();
-        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;
         _stateContainerService.SetValue(deserialize.BoardHashCode);
         return deserialize;
     }
@@ -64,7 +66,7 @@ public class KanbanApi
             await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{board}/cardlist/{addCard.cardlist}",
                 addCard);
         var json = await responseMessage.Content.ReadAsStringAsync();
-        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;
         _stateContainerService.SetValue(deserialize.BoardHashCode);
 
         return deserialize;
@@ -76,9 +78,9 @@ public class KanbanApi
         var requestUri = $"http://localhost:8080/board/{board}/cardlist/{cardlist}/cards/{card}/move";
         var responseMessage = await httpClient.PostAsJsonAsync(requestUri, moveCard);
         var json = await responseMessage.Content.ReadAsStringAsync();
-        var deserialize = JsonSerializer.Deserialize<Board>(json)!;
+        var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;
         _stateContainerService.SetValue(deserialize.BoardHashCode);
-
+        
         return deserialize;
     }
 
