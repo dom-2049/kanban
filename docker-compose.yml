@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   nginx:
-    image: public.ecr.aws/u9g6t4t5/kanban:nginx
+    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:nginx
     depends_on:
       - client
       - backend
@@ -20,7 +20,7 @@ services:
           cpus: "0.25"
           memory: "0.1G"
   db:
-    image: public.ecr.aws/u9g6t4t5/kanban:db
+    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:db
     restart: always
     ports:
       - "5432:5432"
@@ -36,7 +36,7 @@ services:
           cpus: "0.25"
           memory: "0.1G"
   backend:
-    image: public.ecr.aws/u9g6t4t5/kanban:backend
+    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -57,7 +57,7 @@ services:
           cpus: "0.25"
           memory: "0.1G"
   client:
-    image: public.ecr.aws/u9g6t4t5/kanban:client
+    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:client
     build:
       context: ./client/Kanban
       dockerfile: Dockerfile
