@@ -15,10 +15,10 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "0.5G"
+          memory: "1.0G"
         reservations:
           cpus: "0.25"
-          memory: "0.1G"
+          memory: "0.3G"
   db:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:db
     restart: always
@@ -31,10 +31,10 @@ services:
       resources:
         limits:
           cpus: "0.50"
-          memory: "0.5G"
+          memory: "1.0G"
         reservations:
           cpus: "0.25"
-          memory: "0.1G"
+          memory: "0.3G"
   backend:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:backend
     build: 
@@ -52,10 +52,10 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "0.5G"
+          memory: "1.0G"
         reservations:
           cpus: "0.25"
-          memory: "0.1G"
+          memory: "0.3G"
   client:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:client
     build:
