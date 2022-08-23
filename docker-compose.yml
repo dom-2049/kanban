@@ -11,14 +11,6 @@ services:
       context: ./nginx
     ports:
       - "80:80"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: "0.5G"
-        reservations:
-          cpus: "0.25"
-          memory: "0.1G"
   db:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:db
     restart: always
@@ -27,14 +19,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./postgres
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: "0.5G"
-        reservations:
-          cpus: "0.25"
-          memory: "0.1G"
   backend:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:backend
     build: 
@@ -48,14 +32,6 @@ services:
     environment:
       - POSTGRES_PWD=password
       - JWT_SECRET=password
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: "1G"
-        reservations:
-          cpus: "0.25"
-          memory: "0.1G"
   client:
     image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:client
     build:
@@ -66,11 +42,3 @@ services:
       - backend
     ports:
     - "3000:3000"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: "0.5G"
-        reservations:
-          cpus: "0.25"
-          memory: "0.1G"
