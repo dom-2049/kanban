@@ -30,20 +30,20 @@ public class KanbanApi
     public async Task<Board[]> GetAllBoards()
     {
         await SetBearerToken();
-        return await httpClient.GetFromJsonAsync<Board[]>("http://localhost:8080/board") ??
+        return await httpClient.GetFromJsonAsync<Board[]>("http://localhost:88/backend/board") ??
                Array.Empty<Board>();
     }
 
     public async Task SaveBoard(CreateBoardRequest board)
     {
         await SetBearerToken();
-        await httpClient.PostAsJsonAsync("http://localhost:8080/board", board);
+        await httpClient.PostAsJsonAsync("http://localhost:88/backend/board", board);
     }
 
     public async Task<Board> GetBoard(string boardName)
     {
         await SetBearerToken();
-        var board = await httpClient.GetFromJsonAsync<Board>($"http://localhost:8080/board/{boardName}");
+        var board = await httpClient.GetFromJsonAsync<Board>($"http://localhost:88/backend/board/{boardName}");
         if (board == null) throw new Exception("Board not returned from service.");
         _stateContainerService.SetValue(board.BoardHashCode);
         return board;
@@ -52,7 +52,7 @@ public class KanbanApi
     public async Task<Board> AddCardList(AddCardListRequest addCardListRequest)
     {
         await SetBearerToken();
-        var responseMessage = await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{addCardListRequest.board}/cardlist", addCardListRequest);
+        var responseMessage = await httpClient.PostAsJsonAsync($"http://localhost:88/backend/board/{addCardListRequest.board}/cardlist", addCardListRequest);
         var json = await responseMessage.Content.ReadAsStringAsync();
         var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;
         _stateContainerService.SetValue(deserialize.BoardHashCode);
@@ -63,7 +63,7 @@ public class KanbanApi
     {
         await SetBearerToken();
         var responseMessage =
-            await httpClient.PostAsJsonAsync($"http://localhost:8080/board/{board}/cardlist/{addCard.cardlist}",
+            await httpClient.PostAsJsonAsync($"http://localhost:88/backend/board/{board}/cardlist/{addCard.cardlist}",
                 addCard);
         var json = await responseMessage.Content.ReadAsStringAsync();
         var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;
@@ -75,7 +75,7 @@ public class KanbanApi
     public async Task<Board> MoveCard(string board, string cardlist, Guid card, MoveCardRequest moveCard)
     {
         await SetBearerToken();
-        var requestUri = $"http://localhost:8080/board/{board}/cardlist/{cardlist}/cards/{card}/move";
+        var requestUri = $"http://localhost:88/backend/board/{board}/cardlist/{cardlist}/cards/{card}/move";
         var responseMessage = await httpClient.PostAsJsonAsync(requestUri, moveCard);
         var json = await responseMessage.Content.ReadAsStringAsync();
         var deserialize = JsonSerializer.Deserialize<Board>(json, options)!;

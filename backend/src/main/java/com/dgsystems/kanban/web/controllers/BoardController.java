@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5019")
 @RequestMapping("/board")
 public class BoardController {
     private final BoardRepository boardRepository;

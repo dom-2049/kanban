@@ -28,7 +28,7 @@ namespace Kanban.Services
 
         public async Task Login(string username, string password) {
             UserAccount user = new UserAccount(username, password);
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync($"http://localhost:8080/authenticate", user);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync($"http://localhost:88/backend/authenticate", user);
             Console.WriteLine(JsonSerializer.Serialize(response));
             if(response.IsSuccessStatusCode) {
                  JwtResponse jwtResponse = await response.Content.ReadFromJsonAsync<JwtResponse>();
