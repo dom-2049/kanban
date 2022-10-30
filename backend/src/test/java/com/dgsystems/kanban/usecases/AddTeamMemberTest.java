@@ -1,7 +1,7 @@
 package com.dgsystems.kanban.usecases;
 
-import com.dgsystems.kanban.entities.BoardMember;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.entities.Member;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +13,11 @@ public class AddTeamMemberTest {
     @Test
     @DisplayName("should add new team member")
     void shouldAddNewTeamMember() {
-        InMemoryBoardMemberRepository boardMemberRepository = new InMemoryBoardMemberRepository();
-        AddTeamMember addTeamMember = new AddTeamMember(boardMemberRepository);
-        addTeamMember.execute(new BoardMember("new member"));
+        InMemoryMemberRepository MemberRepository = new InMemoryMemberRepository();
+        AddTeamMember addTeamMember = new AddTeamMember(MemberRepository);
+        addTeamMember.execute(new Member("new member"));
 
-        List<BoardMember> members = boardMemberRepository.getAll();
+        List<Member> members = MemberRepository.getAll();
 
         assertThat(members.get(0).username()).isEqualTo("new member");
     }

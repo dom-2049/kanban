@@ -2,7 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,13 +21,13 @@ public class MoveCardBetweenListsInParallelTest {
     public static final String IN_PROGRESS = "in progress";
     public static final String DONE = "done";
     public BoardRepository boardRepository;
-    private BoardMemberRepository boardMemberRepository;
+    private MemberRepository MemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        boardMemberRepository = new InMemoryBoardMemberRepository();
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository = new InMemoryMemberRepository();
+        MemberRepository.save(new Member("owner"));
         Context.initialize(boardRepository);
     }
 
@@ -36,20 +36,20 @@ public class MoveCardBetweenListsInParallelTest {
     void shouldNotExecuteLastMovementWhenCardIsMovedInParallel() throws BrokenBarrierException, InterruptedException, OwnerDoesNotExistException, MemberNotInTeamException {
         Card card = new Card(UUID.randomUUID(),"do the dishes", "must do the dishes!", Optional.empty());
 
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
 
-        Optional<BoardMember> memberOptional = Optional.of(owner);
+        Optional<Member> memberOptional = Optional.of(owner);
         createBoard.execute(BOARD_NAME, memberOptional);
         addCardListToBoard.execute(BOARD_NAME, TO_DO, memberOptional);
         addCardListToBoard.execute(BOARD_NAME, IN_PROGRESS, memberOptional);
         addCardListToBoard.execute(BOARD_NAME, DONE, memberOptional);
         addCardToCardList.execute(BOARD_NAME, IN_PROGRESS,card, memberOptional);
 
-        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
+        Board beforeExecutionBoard = getBoard.execute(BOARD_NAME, MemberRepository.getBy(owner.username())).orElseThrow();
 
         final CyclicBarrier gate = new CyclicBarrier(3);
 
@@ -64,7 +64,7 @@ public class MoveCardBetweenListsInParallelTest {
         t1.join();
         t2.join();
 
-        Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
+        Board board = getBoard.execute(BOARD_NAME, MemberRepository.getBy(owner.username())).orElseThrow();
 
         assertThat(board.cardLists().get(0).cards()).isNotEmpty();
         assertThat(board.cardLists().get(1).cards()).isEmpty();
@@ -78,9 +78,9 @@ public class MoveCardBetweenListsInParallelTest {
         private final String to;
         private final CyclicBarrier gate;
         private final Board beforeExecutionBoard;
-        private final BoardMember userResponsibleForOperation;
+        private final Member userResponsibleForOperation;
 
-        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate, Board beforeExecutionBoard, BoardMember userResponsibleForOperation) {
+        public ParallelCardMove(int delay, Card card, String from, String to, CyclicBarrier gate, Board beforeExecutionBoard, Member userResponsibleForOperation) {
             this.delay = delay;
             this.card = card;
             this.from = from;

@@ -2,10 +2,10 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 import com.dgsystems.kanban.entities.BoardsDoNotBelongToOwnerException;
 import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,28 +22,28 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class GetAllBoardsTest {
     public BoardRepository boardRepository;
-    private BoardMemberRepository boardMemberRepository;
+    private MemberRepository MemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        boardMemberRepository = new InMemoryBoardMemberRepository();
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository = new InMemoryMemberRepository();
+        MemberRepository.save(new Member("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should return only boards created by user")
     void shouldReturnOnlyBoardsCreatedByUser() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
-        BoardMember user1 = new BoardMember("user1");
-        BoardMember user2 = new BoardMember("user2");
-        boardMemberRepository.save(user1);
-        boardMemberRepository.save(user2);
+        Member user1 = new Member("user1");
+        Member user2 = new Member("user2");
+        MemberRepository.save(user1);
+        MemberRepository.save(user2);
 
         Board user1Board = new Board("user1Board", Collections.emptyList(), singletonList(user1), user1);
         Board user2Board = new Board("user2Board", Collections.emptyList(), singletonList(user2), user2);
 
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         createBoard.execute("user1Board", Optional.of(user1));
         createBoard.execute("user2Board", Optional.of(user2));
 
@@ -58,13 +58,13 @@ public class GetAllBoardsTest {
     @Test
     @DisplayName("Should get all boards")
     void shouldGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
 
         createBoard.execute("work", Optional.of(owner));
         createBoard.execute("hobby", Optional.of(owner));
-        List<Board> response = getAllBoards.execute(Optional.of(new BoardMember("owner")));
+        List<Board> response = getAllBoards.execute(Optional.of(new Member("owner")));
 
         Assertions.assertThat(response).hasSize(2);
         Assertions.assertThat(response.get(0).title()).isEqualTo("work");

@@ -1,7 +1,7 @@
 package com.dgsystems.kanban.infrastructure.persistence.in_memory;
 
 import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 import com.dgsystems.kanban.usecases.BoardRepository;
 import com.jcabi.aspects.Loggable;
 
@@ -35,7 +35,7 @@ public class InMemoryBoardRepository implements BoardRepository {
 
     @Override
     @Loggable
-    public List<Board> getAllForOwner(BoardMember owner) {
+    public List<Board> getAllForOwner(Member owner) {
         return boards.stream()
                 .filter(b -> b.owner().equals(owner))
                 .collect(unmodifiableListCollector());

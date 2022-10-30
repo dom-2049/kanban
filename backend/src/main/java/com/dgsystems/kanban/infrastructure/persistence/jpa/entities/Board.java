@@ -2,38 +2,45 @@ package com.dgsystems.kanban.infrastructure.persistence.jpa.entities;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity(name = "Board")
-public class BoardEntity {
+public class Board {
 
     @Id
     private String title;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Collection<CardListEntity> cardlists;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Collection<BoardMemberEntity> members;
+    private Set<CardList> cardlists;
+
+    @ManyToMany
+    @JoinTable(
+            name = "boards_members",
+            joinColumns = @JoinColumn(name = "username"),
+            inverseJoinColumns = @JoinColumn(name = "title")
+    )
+    private Set<Member> members;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "username")
-    private BoardMemberEntity owner;
+    private Member owner;
 
     public String title() {
         return title;
     }
 
-    public BoardMemberEntity getOwner() {
+    public Member getOwner() {
         return owner;
     }
 
-    public Collection<CardListEntity> cardlists() {
+    public Collection<CardList> cardlists() {
         return cardlists;
     }
 
-    public Collection<BoardMemberEntity> members() {
+    public Collection<Member> members() {
         return members;
     }
 
-    public BoardEntity(String title, Collection<CardListEntity> cardlists, Collection<BoardMemberEntity> members, BoardMemberEntity owner) {
+    public Board(String title, Set<CardList> cardlists, Set<Member> members, Member owner) {
         super();
         this.title = title;
         this.cardlists = cardlists;
@@ -41,7 +48,7 @@ public class BoardEntity {
         this.owner = owner;
     }
 
-    public BoardEntity() {
+    public Board() {
         super();
     }
 }

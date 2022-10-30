@@ -1,9 +1,9 @@
 package com.dgsystems.kanban.web.controllers;
 
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.UserAccount;
 import com.dgsystems.kanban.usecases.AddTeamMember;
-import com.dgsystems.kanban.usecases.BoardMemberRepository;
+import com.dgsystems.kanban.usecases.MemberRepository;
 import com.dgsystems.kanban.web.JwtRequest;
 import com.dgsystems.kanban.web.JwtResponse;
 import com.dgsystems.kanban.web.UserAccountDTO;
@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthenticationController {
-	private BoardMemberRepository boardMemberRepository;
+	private MemberRepository MemberRepository;
 
-	public AuthenticationController(BoardMemberRepository boardMemberRepository, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Lazy JwtUserDetailsService userDetailsService) {
-		this.boardMemberRepository = boardMemberRepository;
+	public AuthenticationController(MemberRepository MemberRepository, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, @Lazy JwtUserDetailsService userDetailsService) {
+		this.MemberRepository = MemberRepository;
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;
@@ -55,8 +55,8 @@ public class AuthenticationController {
 	@PostMapping("/register")
 	public ResponseEntity<?> saveUser(@RequestBody UserAccountDTO user) {
 		UserAccount save = userDetailsService.save(user);
-		AddTeamMember addTeamMember = new AddTeamMember(boardMemberRepository);
-		addTeamMember.execute(new BoardMember(user.getUsername()));
+		AddTeamMember addTeamMember = new AddTeamMember(MemberRepository);
+		addTeamMember.execute(new Member(user.getUsername()));
 		return ResponseEntity.ok(save);
 	}
 	

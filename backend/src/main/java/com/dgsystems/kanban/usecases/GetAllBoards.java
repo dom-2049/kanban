@@ -2,7 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.BoardSession;
 import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 import com.dgsystems.kanban.entities.BoardsDoNotBelongToOwnerException;
 import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
 import com.jcabi.aspects.Loggable;
@@ -18,7 +18,7 @@ public class GetAllBoards {
     }
 
     @Loggable(prepend = true)
-    public List<Board> execute(Optional<BoardMember> owner) throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+    public List<Board> execute(Optional<Member> owner) throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
         if(owner.isEmpty()) throw new OwnerDoesNotExistException();
         List<Board> boards = boardRepository.getAllForOwner(owner.get());
         if (boards.stream().allMatch(b -> b.owner().equals(owner.get()))) {

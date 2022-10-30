@@ -3,7 +3,7 @@ package com.dgsystems.kanban.usecases;
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,21 +17,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class AddBoardMemberToCardTest {
+public class AddMemberToCardTest {
     public static final String BOARD_NAME = "work";
     public static final String LIST_TITLE = "todo";
     private Card card;
     private BoardRepository boardRepository;
-    private InMemoryBoardMemberRepository teamMemberRepository;
-    private BoardMember owner;
+    private MemberRepository teamMemberRepository;
+    private Member owner;
 
     @Test
     @DisplayName("Should add team member to card")
     void shouldAddTeamMemberToCard() throws MemberNotInTeamException, OwnerDoesNotExistException {
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
-        BoardMember boardMember = new BoardMember("username");
-        addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, boardMember, owner);
-        Optional<BoardMember> memberOptional = Optional.of(boardMember);
+        Member Member = new Member("username");
+        addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, Member, owner);
+        Optional<Member> memberOptional = Optional.of(Member);
         Board newBoard = new GetBoard(boardRepository).execute(BOARD_NAME, memberOptional).orElseThrow();
         assertThat(firstCard(newBoard.cardLists()).teamMember()).isEqualTo(memberOptional);
     }
@@ -40,30 +40,30 @@ public class AddBoardMemberToCardTest {
     @DisplayName("Should not be able to add member to card when not in team")
     void shouldNotBeAbleToAddMemberToCardWhenNotInTeam() {
         AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(teamMemberRepository, boardRepository);
-        BoardMember boardMember = new BoardMember("username");
-        BoardMember invalidUser = new BoardMember("invalid_user");
-        assertThrows(CompletionException.class, () -> addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, boardMember, invalidUser));
+        Member Member = new Member("username");
+        Member invalidUser = new Member("invalid_user");
+        assertThrows(CompletionException.class, () -> addTeamMemberToCard.execute(BOARD_NAME, LIST_TITLE, card, Member, invalidUser));
         //TODO: assert member is not added to card
     }
 
     @BeforeEach
     public void setup() throws OwnerDoesNotExistException, MemberNotInTeamException {
         boardRepository = new InMemoryBoardRepository();
-        teamMemberRepository = new InMemoryBoardMemberRepository();
+        teamMemberRepository = new InMemoryMemberRepository();
 
         Context.initialize(boardRepository);
 
         CreateBoard createBoard = new CreateBoard(boardRepository, teamMemberRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        owner = new BoardMember("owner");
+        owner = new Member("owner");
         teamMemberRepository.save(owner);
         createBoard.execute(BOARD_NAME, Optional.of(owner));
         addCardListToBoard.execute(BOARD_NAME, LIST_TITLE, Optional.of(owner));
         card = new Card(UUID.randomUUID(), "dishes", "do the dishes today", Optional.empty());
         addCardToCardList.execute(BOARD_NAME, LIST_TITLE, card, Optional.of(owner));
         AddMemberToBoard addMemberToBoard = new AddMemberToBoard(teamMemberRepository, boardRepository);
-        addMemberToBoard.execute(BOARD_NAME, new BoardMember("username"), owner);
+        addMemberToBoard.execute(BOARD_NAME, new Member("username"), owner);
     }
 
     private Card firstCard(List<CardList> cardListList) {

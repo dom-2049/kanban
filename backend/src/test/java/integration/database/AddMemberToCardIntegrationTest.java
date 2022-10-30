@@ -31,46 +31,46 @@ public class AddMemberToCardIntegrationTest {
     private static final UUID CARD_ID = UUID.randomUUID();
 
     @Resource
-    BoardMemberRepository boardMemberRepository;
+    MemberRepository MemberRepository;
     @Resource
     BoardRepository boardRepository;
 
     @BeforeEach
     public void setup() {
         Context.initialize(boardRepository);
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository.save(new Member("owner"));
     }
 
     @Test
     @DisplayName("Should add team member to card in integration with database")
     void shouldAddTeamMemberToCardInIntegrationWithDatabase() throws MemberNotInTeamException, OwnerDoesNotExistException {
-        BoardMember boardMember = new BoardMember(USERNAME);
+        Member Member = new Member(USERNAME);
         Card card = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.empty());
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        AddTeamMember addTeamMember = new AddTeamMember(boardMemberRepository);
-        AddMemberToBoard addMemberToBoard = new AddMemberToBoard(boardMemberRepository, boardRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
+        AddTeamMember addTeamMember = new AddTeamMember(MemberRepository);
+        AddMemberToBoard addMemberToBoard = new AddMemberToBoard(MemberRepository, boardRepository);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(boardMemberRepository, boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        AddTeamMemberToCard addTeamMemberToCard = new AddTeamMemberToCard(MemberRepository, boardRepository);
+        Member owner = new Member("owner");
 
         createBoard.execute(BOARD_NAME, Optional.of(owner));
-        addTeamMember.execute(new BoardMember(USERNAME));
-        addMemberToBoard.execute(BOARD_NAME, boardMember, owner);
+        addTeamMember.execute(new Member(USERNAME));
+        addMemberToBoard.execute(BOARD_NAME, Member, owner);
         UUID cardListId = addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, Optional.of(owner));
         addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, card, Optional.of(owner));
-        addTeamMemberToCard.execute(BOARD_NAME, CARD_LIST_TITLE, card, boardMember, owner);
+        addTeamMemberToCard.execute(BOARD_NAME, CARD_LIST_TITLE, card, Member, owner);
 
         GetBoard getBoard = new GetBoard(boardRepository);
-        Board board = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
+        Board board = getBoard.execute(BOARD_NAME, MemberRepository.getBy(owner.username())).orElseThrow();
 
-        Board expectedBoard = expectedBoard(boardMember, cardListId);
+        Board expectedBoard = expectedBoard(Member, cardListId);
         assertThat(board).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedBoard);
     }
 
-    private Board expectedBoard(BoardMember boardMember, UUID cardListId) {
-        Card expectedCard = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.of(boardMember));
+    private Board expectedBoard(Member Member, UUID cardListId) {
+        Card expectedCard = new Card(CARD_ID, DO_THE_DISHES, DO_THE_DISHES, Optional.of(Member));
         CardList expectedCardList = new CardList(cardListId, CARD_LIST_TITLE, List.of(expectedCard));
-        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(boardMember, new BoardMember("owner")), new BoardMember("owner"));
+        return new Board(BOARD_NAME, List.of(expectedCardList), List.of(Member, new Member("owner")), new Member("owner"));
     }
 }

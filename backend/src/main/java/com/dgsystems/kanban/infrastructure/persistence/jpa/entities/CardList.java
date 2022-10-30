@@ -6,16 +6,16 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Entity(name = "CardList")
-public class CardListEntity {
+public class CardList {
     @Id
     private UUID id;
     @NotEmpty
     private String title;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_title")
-    private BoardEntity board;
+    private Board board;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Collection<CardEntity> cards;
+    private Collection<Card> cards;
 
     public UUID id() {
         return id;
@@ -25,23 +25,23 @@ public class CardListEntity {
         return title;
     }
 
-    public Collection<CardEntity> cards() {
+    public Collection<Card> cards() {
         return cards;
     }
 
-    public BoardEntity getBoard() {
+    public Board getBoard() {
         return board;
     }
 
-    public void setBoard(BoardEntity board) {
+    public void setBoard(Board board) {
         this.board = board;
     }
 
-    public CardListEntity() {
+    public CardList() {
         super();
     }
 
-    public CardListEntity(UUID id, String title, Collection<CardEntity> cards) {
+    public CardList(UUID id, String title, Collection<Card> cards) {
         this();
         this.id = id;
         this.title = title;

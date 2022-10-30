@@ -34,14 +34,14 @@ public class GetAllBoardsIntegrationTest {
     BoardRepository boardRepository;
 
     @Resource
-    BoardMemberRepository boardMemberRepository;
+    MemberRepository MemberRepository;
 
     @BeforeAll
     public void setup() throws OwnerDoesNotExistException {
         Context.initialize(boardRepository);
-        BoardMember owner = new BoardMember("owner");
-        boardMemberRepository.save(owner);
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        Member owner = new Member("owner");
+        MemberRepository.save(owner);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         createBoard.execute(BOARD_NAME, Optional.of(owner));
     }
 
@@ -49,13 +49,13 @@ public class GetAllBoardsIntegrationTest {
     @DisplayName("Should add card list to board after a get all boards")
     void shouldAddCardListToBoardAfterAGetAllBoards() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException, MemberNotInTeamException {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
         List<Board> boards = getAllBoards.execute(Optional.of(owner));
         Board board = boards.get(0);
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         UUID cardListId = addCardListToBoard.execute(board.title(), CARD_LIST_TITLE, Optional.of(owner));
         GetBoard getBoard = new GetBoard(boardRepository);
-        Optional<Board> optionalBoard = getBoard.execute(board.title(), boardMemberRepository.getBy(owner.username()));
+        Optional<Board> optionalBoard = getBoard.execute(board.title(), MemberRepository.getBy(owner.username()));
         Board expectedBoard = new Board(BOARD_NAME, List.of(new CardList(cardListId, CARD_LIST_TITLE, Collections.emptyList())), singletonList(owner), owner);
         assertThat(optionalBoard.orElseThrow()).isEqualTo(expectedBoard);
     }
@@ -63,15 +63,15 @@ public class GetAllBoardsIntegrationTest {
     @Test
     @DisplayName("Should return only boards created by user")
     void shouldReturnOnlyBoardsCreatedByUser() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
-        BoardMember user1 = new BoardMember("user1");
-        BoardMember user2 = new BoardMember("user2");
-        boardMemberRepository.save(user1);
-        boardMemberRepository.save(user2);
+        Member user1 = new Member("user1");
+        Member user2 = new Member("user2");
+        MemberRepository.save(user1);
+        MemberRepository.save(user2);
 
         Board user1Board = new Board("user1Board", Collections.emptyList(), singletonList(user1), user1);
         Board user2Board = new Board("user2Board", Collections.emptyList(), singletonList(user2), user2);
 
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         createBoard.execute("user1Board", Optional.of(user1));
         createBoard.execute("user2Board", Optional.of(user2));
 
@@ -81,5 +81,24 @@ public class GetAllBoardsIntegrationTest {
 
         assertThat(boardsUser1).isEqualTo(singletonList(user1Board));
         assertThat(boardsUser2).isEqualTo(singletonList(user2Board));
+    }
+
+    @Test
+    @DisplayName("Should get two boards created by same user")
+    void shouldGetTwoBoardsCreatedBySameUser() throws BoardsDoNotBelongToOwnerException, OwnerDoesNotExistException {
+        Member user1 = new Member("user1");
+        MemberRepository.save(user1);
+
+        Board expectedWorkBoard = new Board("work", Collections.emptyList(), singletonList(user1), user1);
+        Board expectedHobbyBoard = new Board("hobby", Collections.emptyList(), singletonList(user1), user1);
+
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
+        createBoard.execute("work", Optional.of(user1));
+        createBoard.execute("hobby", Optional.of(user1));
+
+        GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
+        List<Board> boardsUser1 = getAllBoards.execute(Optional.of(user1));
+
+        assertThat(boardsUser1).isEqualTo(List.of(expectedWorkBoard, expectedHobbyBoard));
     }
 }

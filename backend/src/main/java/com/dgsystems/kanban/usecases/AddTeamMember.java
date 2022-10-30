@@ -1,15 +1,15 @@
 package com.dgsystems.kanban.usecases;
 
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 
 public class AddTeamMember {
-    private final BoardMemberRepository boardMemberRepository;
+    private final MemberRepository MemberRepository;
 
-    public AddTeamMember(BoardMemberRepository boardMemberRepository) {
-        this.boardMemberRepository = boardMemberRepository;
+    public AddTeamMember(MemberRepository MemberRepository) {
+        this.MemberRepository = MemberRepository;
     }
 
-    public void execute(BoardMember boardMember) {
-        boardMemberRepository.save(boardMember);
+    public void execute(Member Member) {
+        MemberRepository.save(Member);
     }
 }

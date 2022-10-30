@@ -2,7 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,22 +20,22 @@ public class AddCardToCardListTest {
     public static final String CARD_LIST_TITLE = "to do";
 
     public BoardRepository boardRepository;
-    private InMemoryBoardMemberRepository boardMemberRepository;
+    private InMemoryMemberRepository MemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        boardMemberRepository = new InMemoryBoardMemberRepository();
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository = new InMemoryMemberRepository();
+        MemberRepository.save(new Member("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should add card to card list")
     void shouldAddCardToCardList() throws OwnerDoesNotExistException, MemberNotInTeamException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        BoardMember owner = new BoardMember("owner");
-        Optional<BoardMember> memberOptional = Optional.of(owner);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
+        Member owner = new Member("owner");
+        Optional<Member> memberOptional = Optional.of(owner);
         createBoard.execute(BOARD_NAME, memberOptional);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
@@ -52,16 +52,16 @@ public class AddCardToCardListTest {
     @Test
     @DisplayName("Should not add card to list when member not in members")
     void shouldNotAddCardToListWhenMemberNotInMembers() throws MemberNotInTeamException, OwnerDoesNotExistException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        BoardMember owner = new BoardMember("owner");
-        Optional<BoardMember> memberOptional = Optional.of(owner);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
+        Member owner = new Member("owner");
+        Optional<Member> memberOptional = Optional.of(owner);
         createBoard.execute(BOARD_NAME, memberOptional);
 
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
         addCardListToBoard.execute(BOARD_NAME, CARD_LIST_TITLE, memberOptional);
 
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        Optional<BoardMember> invalidUser = Optional.of(new BoardMember("invalid_user"));
+        Optional<Member> invalidUser = Optional.of(new Member("invalid_user"));
         assertThrows(CompletionException.class, () -> addCardToCardList.execute(BOARD_NAME, CARD_LIST_TITLE, new Card(UUID.randomUUID(), "card title", "card description", Optional.empty()), invalidUser));
         //TODO: assert card is not added
     }

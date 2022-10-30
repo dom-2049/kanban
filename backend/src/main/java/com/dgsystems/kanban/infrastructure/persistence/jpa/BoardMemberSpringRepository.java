@@ -1,10 +1,10 @@
 package com.dgsystems.kanban.infrastructure.persistence.jpa;
 
-import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.BoardMemberEntity;
+import com.dgsystems.kanban.entities.Member;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-interface BoardMemberSpringRepository extends CrudRepository<BoardMemberEntity, String> {
-    BoardMemberEntity findByUsername(String username);
+interface MemberSpringRepository extends CrudRepository<com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member, String> {
+    Member findByUsername(String username);
 }

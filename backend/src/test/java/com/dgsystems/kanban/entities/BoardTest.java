@@ -14,7 +14,7 @@ public class BoardTest {
     @Test
     @DisplayName("board should return card")
     public void boardShouldReturnCard() throws MemberNotInTeamException {
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
         Card expected = new Card(UUID.randomUUID(), "dishes", "dishes", Optional.of(owner));
         Board board = new Board("board", Collections.emptyList(), List.of(owner), owner)
                 .addCardList(new CardList(UUID.randomUUID(), "to do", Collections.emptyList()), owner)

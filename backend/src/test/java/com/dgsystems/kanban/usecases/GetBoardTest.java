@@ -2,7 +2,7 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.*;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,25 +23,25 @@ class GetBoardTest {
     public static final String IN_PROGRESS = "in progress";
 
     public BoardRepository boardRepository;
-    private InMemoryBoardMemberRepository boardMemberRepository;
+    private InMemoryMemberRepository MemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        boardMemberRepository = new InMemoryBoardMemberRepository();
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository = new InMemoryMemberRepository();
+        MemberRepository.save(new Member("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should get board")
     void shouldGetBoard() throws OwnerDoesNotExistException, MemberNotInTeamException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
 
         createBoard.execute(BOARD_NAME, Optional.of(owner));
-        Board response = getBoard.execute(BOARD_NAME, boardMemberRepository.getBy(owner.username())).orElseThrow();
+        Board response = getBoard.execute(BOARD_NAME, MemberRepository.getBy(owner.username())).orElseThrow();
 
         assertThat(response.title()).isEqualTo(BOARD_NAME);
         //TODO: validate card lists are immutable
@@ -49,12 +49,12 @@ class GetBoardTest {
 
     @Test
     @DisplayName("Should throw error when trying to get board but member not in board members")
-    void shouldThrowErrorWhenTryingToGetBoardButMemberNotInBoardMembers() throws OwnerDoesNotExistException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+    void shouldThrowErrorWhenTryingToGetBoardButMemberNotInMembers() throws OwnerDoesNotExistException {
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
         GetBoard getBoard = new GetBoard(boardRepository);
-        BoardMember owner = new BoardMember("owner");
+        Member owner = new Member("owner");
 
         createBoard.execute(BOARD_NAME, Optional.of(owner));
-        assertThrows(MemberNotInTeamException.class, () -> getBoard.execute(BOARD_NAME, Optional.of(new BoardMember("invalid_user"))));
+        assertThrows(MemberNotInTeamException.class, () -> getBoard.execute(BOARD_NAME, Optional.of(new Member("invalid_user"))));
     }
 }

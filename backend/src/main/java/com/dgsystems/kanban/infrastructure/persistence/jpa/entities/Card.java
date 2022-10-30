@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Entity(name = "Card")
-public final class CardEntity {
+public final class Card {
     @Id
     private UUID id;
     @NotEmpty
@@ -13,28 +13,28 @@ public final class CardEntity {
     @NotEmpty
     private String description;
     @ManyToOne
-    private BoardMemberEntity boardMember;
+    private Member Member;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "card_list_id")
-    private CardListEntity cardList;
+    private CardList cardList;
 
-    public CardListEntity getCardList() {
+    public CardList getCardList() {
         return cardList;
     }
 
-    public void setCardList(CardListEntity cardList) {
+    public void setCardList(CardList cardList) {
         this.cardList = cardList;
     }
 
-    public CardEntity(UUID id, String title, String description, BoardMemberEntity boardMember) {
+    public Card(UUID id, String title, String description, Member Member) {
         super();
         this.id = id;
         this.title = title;
         this.description = description;
-        this.boardMember = boardMember;
+        this.Member = Member;
     }
 
-    public CardEntity() {
+    public Card() {
         super();
     }
 
@@ -50,7 +50,7 @@ public final class CardEntity {
         return description;
     }
 
-    public BoardMemberEntity boardMember() {
-        return boardMember;
+    public Member Member() {
+        return Member;
     }
 }

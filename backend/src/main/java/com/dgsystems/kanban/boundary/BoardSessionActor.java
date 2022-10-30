@@ -11,13 +11,13 @@ import scala.util.Right;
 import java.util.List;
 
 class BoardSessionActor extends AbstractActor {
-    record Move(Card card, String from, String to, int previousHashCode, BoardMember userResponsibleForOperation) { }
-    record AddCardList(CardList cardList, BoardMember userResponsibleForOperation) { }
-    record StartBoard(String boardName, List<CardList> cardLists, List<BoardMember> members, BoardMember owner) { }
-    record AddCardToCardList(String cardListTitle, Card card, BoardMember userResponsibleForOperation) { }
-    record AddMemberToCard(String cardList, Card card, BoardMember boardMember, BoardMember userResponsibleForOperation) { }
-    record AddMemberToBoard(BoardMember newMember, BoardMember userResponsibleForOperation) { }
-    record GetAllMembers(BoardMember userResponsibleForOperation) { }
+    record Move(Card card, String from, String to, int previousHashCode, Member userResponsibleForOperation) { }
+    record AddCardList(CardList cardList, Member userResponsibleForOperation) { }
+    record StartBoard(String boardName, List<CardList> cardLists, List<Member> members, Member owner) { }
+    record AddCardToCardList(String cardListTitle, Card card, Member userResponsibleForOperation) { }
+    record AddMemberToCard(String cardList, Card card, Member Member, Member userResponsibleForOperation) { }
+    record AddMemberToBoard(Member newMember, Member userResponsibleForOperation) { }
+    record GetAllMembers(Member userResponsibleForOperation) { }
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private Board board;
@@ -71,7 +71,7 @@ class BoardSessionActor extends AbstractActor {
                         AddMemberToCard.class,
                         a -> {
                             try {
-                                this.board = board.addMemberToCard(a.cardList(), a.card(), a.boardMember(), a.userResponsibleForOperation);
+                                this.board = board.addMemberToCard(a.cardList(), a.card(), a.Member(), a.userResponsibleForOperation);
                             } catch (MemberNotInTeamException e) {
                                 throw new RuntimeException(e);
                             }

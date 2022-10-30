@@ -22,10 +22,10 @@ import java.util.UUID;
 @RequestMapping("/board")
 public class BoardController {
     private final BoardRepository boardRepository;
-    private final BoardMemberRepository boardMemberRepository;
+    private final MemberRepository MemberRepository;
 
-    public BoardController(BoardRepository boardRepository, BoardMemberRepository boardMemberRepository) {
-        this.boardMemberRepository = boardMemberRepository;
+    public BoardController(BoardRepository boardRepository, MemberRepository MemberRepository) {
+        this.MemberRepository = MemberRepository;
         this.boardRepository = boardRepository;
     }
 
@@ -33,12 +33,12 @@ public class BoardController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody CreateBoardRequest request, Principal principal) {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
 
-        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+        Optional<Member> Member = MemberRepository.getBy(principal.getName());
 
         try {
-            createBoard.execute(request.boardName(), boardMember);
+            createBoard.execute(request.boardName(), Member);
         } catch (OwnerDoesNotExistException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +52,7 @@ public class BoardController {
 
     private Board getBoard(String boardName, Principal principal) throws OwnerDoesNotExistException, MemberNotInTeamException {
         GetBoard getBoard = new GetBoard(boardRepository);
-        return getBoard.execute(boardName, boardMemberRepository.getBy(principal.getName())).map(b -> {
+        return getBoard.execute(boardName, MemberRepository.getBy(principal.getName())).map(b -> {
             GetBoardPresenter presenter = new GetBoardPresenter();
             return presenter.present(b);
         }).orElseThrow();
@@ -64,8 +64,8 @@ public class BoardController {
         GetAllBoards getAllBoards = new GetAllBoards(boardRepository);
         GetAllBoardsPresenter presenter = new GetAllBoardsPresenter();
         try {
-            Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
-            return presenter.present(getAllBoards.execute(boardMember));
+            Optional<Member> Member = MemberRepository.getBy(principal.getName());
+            return presenter.present(getAllBoards.execute(Member));
         } catch (BoardsDoNotBelongToOwnerException | OwnerDoesNotExistException e) {
             throw new RuntimeException(e);
         }
@@ -76,8 +76,8 @@ public class BoardController {
     @ResponseStatus(HttpStatus.CREATED)
     public Board addCardListToBoard(@RequestBody AddCardListRequest request, @PathVariable String boardName, Principal principal) throws MemberNotInTeamException, OwnerDoesNotExistException {
         AddCardListToBoard addCardListToBoard = new AddCardListToBoard(boardRepository);
-        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
-        addCardListToBoard.execute(boardName, request.cardList(), boardMember);
+        Optional<Member> Member = MemberRepository.getBy(principal.getName());
+        addCardListToBoard.execute(boardName, request.cardList(), Member);
         return getBoard(boardName, principal);
     }
 
@@ -86,8 +86,8 @@ public class BoardController {
     @ResponseStatus(HttpStatus.CREATED)
     public Board addCardToCardList(@RequestBody AddCardRequest addCardRequest, @PathVariable String board, @PathVariable String cardlist, Principal principal) throws MemberNotInTeamException, OwnerDoesNotExistException {
         AddCardToCardList addCardToCardList = new AddCardToCardList(boardRepository);
-        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
-        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()), boardMember);
+        Optional<Member> Member = MemberRepository.getBy(principal.getName());
+        addCardToCardList.execute(board, cardlist, new Card(UUID.randomUUID(), addCardRequest.cardTitle(), "", Optional.empty()), Member);
         return getBoard(board, principal);
     }
 
@@ -96,9 +96,9 @@ public class BoardController {
     @ResponseStatus(HttpStatus.OK)
     public Board moveCard(@RequestBody MoveCardRequest moveCardRequest, @PathVariable String board, @PathVariable String cardlist, @PathVariable UUID cardId, Principal principal) throws Throwable {
         MoveCardBetweenLists moveCardBetweenLists = new MoveCardBetweenLists(boardRepository);
-        Optional<BoardMember> boardMember = boardMemberRepository.getBy(principal.getName());
+        Optional<Member> Member = MemberRepository.getBy(principal.getName());
         Card card_ = boardRepository.getBoard(board).map(b -> b.getCard(moveCardRequest.card())).orElseThrow().orElseThrow();
-        moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card_, moveCardRequest.boardHashCode(), boardMember.get());
+        moveCardBetweenLists.execute(board, moveCardRequest.from(), moveCardRequest.to(), card_, moveCardRequest.boardHashCode(), Member.get());
         return getBoard(board, principal);
     }
 }

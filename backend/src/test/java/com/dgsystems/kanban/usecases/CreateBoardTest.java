@@ -2,9 +2,9 @@ package com.dgsystems.kanban.usecases;
 
 import com.dgsystems.kanban.boundary.Context;
 import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardMember;
+import com.dgsystems.kanban.entities.Member;
 import com.dgsystems.kanban.entities.OwnerDoesNotExistException;
-import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardMemberRepository;
+import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryMemberRepository;
 import com.dgsystems.kanban.infrastructure.persistence.in_memory.InMemoryBoardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,21 +18,21 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 
 public class CreateBoardTest {
     public BoardRepository boardRepository;
-    private BoardMemberRepository boardMemberRepository;
+    private MemberRepository MemberRepository;
 
     @BeforeEach
     void setup() {
         boardRepository = new InMemoryBoardRepository();
-        boardMemberRepository = new InMemoryBoardMemberRepository();
-        boardMemberRepository.save(new BoardMember("owner"));
+        MemberRepository = new InMemoryMemberRepository();
+        MemberRepository.save(new Member("owner"));
         Context.initialize(boardRepository);
     }
 
     @Test
     @DisplayName("Should create empty board")
     void shouldCreateEmptyBoard() throws OwnerDoesNotExistException {
-        CreateBoard createBoard = new CreateBoard(boardRepository, boardMemberRepository);
-        BoardMember owner = new BoardMember("owner");
+        CreateBoard createBoard = new CreateBoard(boardRepository, MemberRepository);
+        Member owner = new Member("owner");
         Board expected = new Board(MoveCardBetweenListsTest.BOARD_NAME, Collections.emptyList(), Collections.singletonList(owner), owner);
         createBoard.execute(MoveCardBetweenListsTest.BOARD_NAME, Optional.of(owner));
         Optional<Board> board = boardRepository.getBoard(MoveCardBetweenListsTest.BOARD_NAME);
@@ -43,8 +43,8 @@ public class CreateBoardTest {
     @Test
     @DisplayName("Should not create board when owner does not exist")
     void shouldNotCreateBoardWhenOwnerDoesNotExist() {
-        CreateBoard createBoard = new CreateBoard(boardRepository, new InMemoryBoardMemberRepository());
-        BoardMember owner = new BoardMember("owner");
+        CreateBoard createBoard = new CreateBoard(boardRepository, new InMemoryMemberRepository());
+        Member owner = new Member("owner");
 
         assertThatExceptionOfType(OwnerDoesNotExistException.class)
                 .isThrownBy(() -> {

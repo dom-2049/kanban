@@ -1,13 +1,9 @@
 package com.dgsystems.kanban.infrastructure.persistence.jpa;
 
-import com.dgsystems.kanban.entities.Board;
-import com.dgsystems.kanban.entities.BoardMember;
-import com.dgsystems.kanban.entities.Card;
-import com.dgsystems.kanban.entities.CardList;
-import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.BoardEntity;
-import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.BoardMemberEntity;
-import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.CardEntity;
-import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.CardListEntity;
+import com.dgsystems.kanban.entities.Member;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Board;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Card;
+import com.dgsystems.kanban.infrastructure.persistence.jpa.entities.CardList;
 import com.dgsystems.kanban.usecases.BoardRepository;
 import com.jcabi.aspects.Loggable;
 import org.springframework.stereotype.Component;
@@ -25,84 +21,84 @@ public class BoardJpaRepository implements BoardRepository {
 
     @Loggable
     @Override
-    public Optional<Board> getBoard(String boardName) {
-        BoardEntity boardEntity = boardSpringRepository.findByTitle(boardName);
-        if(boardEntity == null)
+    public Optional<com.dgsystems.kanban.entities.Board> getBoard(String boardName) {
+        Board board = boardSpringRepository.findByTitle(boardName);
+        if(board == null)
             return Optional.empty();
         else
-            return Optional.of(getBoard(boardEntity));
+            return Optional.of(getBoard(board));
     }
 
     @Loggable
     @Override
-    public void save(Board board) {
-        BoardEntity entity = getBoard(board);
+    public void save(com.dgsystems.kanban.entities.Board board) {
+        Board entity = getBoard(board);
         boardSpringRepository.save(entity);
     }
 
     @Loggable
     @Override
-    public List<Board> getAllForOwner(BoardMember owner) {
-        Iterable<BoardEntity> boards = boardSpringRepository.findByOwner(new BoardMemberEntity(owner.username()));
-        List<Board> result = new ArrayList<>();
+    public List<com.dgsystems.kanban.entities.Board> getAllForOwner(com.dgsystems.kanban.entities.Member owner) {
+        Iterable<Board> boards = boardSpringRepository.findByOwner(new com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member(owner.username()));
+        List<com.dgsystems.kanban.entities.Board> result = new ArrayList<>();
 
-        for (BoardEntity boardEntity : boards) {
-            result.add(getBoard(boardEntity));
+        for (Board board : boards) {
+            result.add(getBoard(board));
         }
 
         return result;
     }
 
-    private BoardEntity getBoard(Board board) {
-        return new BoardEntity(board.title(), getCardLists(board.cardLists()), getMembers(board.members()), new BoardMemberEntity(board.owner().username()));
+    private Board getBoard(com.dgsystems.kanban.entities.Board board) {
+        return new Board(board.title(), getCardLists(board.cardLists()), getMembers(board.members()), new com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member(board.owner().username()));
     }
 
-    private Collection<BoardMemberEntity> getMembers(List<BoardMember> members) {
-        return members.stream().map(m -> new BoardMemberEntity(m.username())).collect(Collectors.toList());
+    private Set<com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member> getMembers(List<com.dgsystems.kanban.entities.Member> members) {
+        return members.stream().map(m -> new com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member(m.username())).collect(Collectors.toSet());
     }
 
-    private Collection<CardListEntity> getCardLists(List<CardList> cardLists) {
-        return cardLists.stream().map(this::getCardList).collect(Collectors.toList());
+    private Set<CardList> getCardLists(List<com.dgsystems.kanban.entities.CardList> cardLists) {
+        return cardLists.stream().map(this::getCardList).collect(Collectors.toSet());
     }
 
-    private CardListEntity getCardList(CardList cl) {
-        return new CardListEntity(cl.id(), cl.title(), getCards(cl.cards()));
+    private CardList getCardList(com.dgsystems.kanban.entities.CardList cl) {
+        return new CardList(cl.id(), cl.title(), getCards(cl.cards()));
     }
 
-    private Collection<CardEntity> getCards(List<Card> cards) {
-        return cards.stream().map(c -> new CardEntity(c.id(), c.title(), c.description(), c.teamMember().map(tm -> new BoardMemberEntity(tm.username())).orElse(null))).collect(Collectors.toList());
+    private Collection<Card> getCards(List<com.dgsystems.kanban.entities.Card> cards) {
+        return cards.stream().map(c -> new Card(c.id(), c.title(), c.description(), c.teamMember().map(tm -> new com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member(tm.username())).orElse(null))).collect(Collectors.toList());
     }
 
-    private Board getBoard(BoardEntity b) {
+    private com.dgsystems.kanban.entities.Board getBoard(Board b) {
         if(b != null) {
-            return new Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()), getBoardMember(b.getOwner()));
+            return new com.dgsystems.kanban.entities.Board(b.title(), getCardLists(b.cardlists()), getMembers(b.members()), getMember(b.getOwner()));
         }
         return null;
     }
 
-    private List<BoardMember> getMembers(Collection<BoardMemberEntity> members) {
-        return members.stream().map(this::getBoardMember).collect(Collectors.toList());
+    private List<com.dgsystems.kanban.entities.Member> getMembers(Collection<com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member> members) {
+        return members.stream().map(this::getMember).collect(Collectors.toList());
     }
 
-    private List<CardList> getCardLists(Collection<CardListEntity> cardListEntities) {
+    private List<com.dgsystems.kanban.entities.CardList> getCardLists(Collection<CardList> cardListEntities) {
         if(cardListEntities.size() == 0)
             return Collections.emptyList();
         return cardListEntities.stream().map(this::getCardList).collect(Collectors.toList());
     }
 
-    private CardList getCardList(CardListEntity cl) {
-        return new CardList(cl.id(), cl.title(), getCards(cl.cards()));
+    private com.dgsystems.kanban.entities.CardList getCardList(CardList cl) {
+        return new com.dgsystems.kanban.entities.CardList(cl.id(), cl.title(), getCards(cl.cards()));
     }
 
-    private List<Card> getCards(Collection<CardEntity> cards) {
+    private List<com.dgsystems.kanban.entities.Card> getCards(Collection<Card> cards) {
         return cards.stream().map(this::getCard).collect(Collectors.toList());
     }
 
-    private BoardMember getBoardMember(BoardMemberEntity m) {
-        return new BoardMember(m.username());
+    private com.dgsystems.kanban.entities.Member getMember(com.dgsystems.kanban.infrastructure.persistence.jpa.entities.Member m) {
+        return new com.dgsystems.kanban.entities.Member(m.getUsername());
     }
 
-    private Card getCard(CardEntity c) {
-        return new Card(c.id(), c.title(), c.description(), c.boardMember() != null ? Optional.of(new BoardMember(c.boardMember().username())) : Optional.empty());
+    private com.dgsystems.kanban.entities.Card getCard(Card c) {
+        return new com.dgsystems.kanban.entities.Card(c.id(), c.title(), c.description(), c.Member() != null ? Optional.of(new com.dgsystems.kanban.entities.Member(c.Member().getUsername())) : Optional.empty());
     }
 }
