@@ -31,6 +31,8 @@ services:
     environment:
       - POSTGRES_PWD=password
       - JWT_SECRET=password
+    volumes:
+      - logs:/logs:rw
   client:
     build:
       context: ./client/Kanban
@@ -40,5 +42,16 @@ services:
       - backend
     ports:
     - "3000:3000"
+  filebeat:
+    depends_on:
+      - client
+      - backend
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./filebeat
+    volumes:
+      - logs:/logs:ro
 volumes:
   db-data:
+  logs:
