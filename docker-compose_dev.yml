@@ -33,6 +33,9 @@ services:
       - JWT_SECRET=password
     volumes:
       - logs:/logs:rw
+      - type: bind
+        source: ./logstash/certificates
+        target: /certs
   client:
     build:
       context: ./client/Kanban
@@ -52,6 +55,9 @@ services:
       context: ./filebeat
     volumes:
       - logs:/logs:ro
+      - type: bind
+        source: ./logstash/certificates
+        target: /certs
 volumes:
   db-data:
   logs:

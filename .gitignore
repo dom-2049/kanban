@@ -5,3 +5,5 @@
 !.elasticbeanstalk/*.global.yml
 .idea/vcs.xml
 .idea/.gitignore
+/logstash/certificates/*.crt
+/logstash/certificates/*.key
