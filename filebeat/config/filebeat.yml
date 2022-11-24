@@ -5,4 +5,9 @@ filebeat.inputs:
 
 output.logstash:
   hosts: ["logstash:5044"]
+  ssl.certificate_authorities: ["/certs/org_ca.crt"]
+  ssl.certificate: "/certs/client_combined.crt"
+  ssl.key: "/certs/client.key"
+  ssl.enabled: true 
+  protocol: "https"
 
