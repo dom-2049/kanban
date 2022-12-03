@@ -1,15 +1,44 @@
-version: '3.1'
+version: '3.2'
 services:
+  nginx:
+    image: domiciomedeiros/kanban-nginx
+    depends_on:
+      - client
+      - backend
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "88:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
   db:
-    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:db
+    image: domiciomedeiros/kanban-db
     restart: always
     ports:
       - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgres
     build:
       dockerfile: Dockerfile
       context: ./postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
   backend:
-    image: 240238364947.dkr.ecr.us-east-1.amazonaws.com/kanban:backend
+    image: domiciomedeiros/kanban-backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -21,3 +50,76 @@ services:
     environment:
       - POSTGRES_PWD=password
       - JWT_SECRET=password
+    volumes:
+      - logs:/logs:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
+  client:
+    image: domiciomedeiros/kanban-client
+    build:
+      context: ./client/Kanban
+      dockerfile: Dockerfile
+    restart: on-failure
+    depends_on:
+      - backend
+    ports:
+    - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
+  filebeat:
+    image: domiciomedeiros/kanban-filebeat
+    depends_on:
+      - client
+      - backend
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./filebeat
+    volumes:
+      - logs:/logs:ro
+      - type: bind
+        source: ./logstash/certificates
+        target: /certs
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
+  logstash:
+    image: domiciomedeiros/kanban-logstash
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./logstash
+    volumes:
+      - type: bind
+        source: ./logstash/certificates
+        target: /certs
+    ports:
+      - 5044:5044
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations: 
+          cpus: '0.25'
+          memory: 100M
+volumes:
+  db-data:
+  logs:
