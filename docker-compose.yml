@@ -89,9 +89,6 @@ services:
       context: ./filebeat
     volumes:
       - logs:/logs:ro
-      - type: bind
-        source: ./logstash/certificates
-        target: /certs
     deploy:
       resources:
         limits:
@@ -106,10 +103,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./logstash
-    volumes:
-      - type: bind
-        source: ./logstash/certificates
-        target: /certs
     ports:
       - 5044:5044
     deploy:

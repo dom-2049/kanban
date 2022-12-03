@@ -1,0 +1,9 @@
+Copy your certificates and keys for logstash and filebeat here with the following names:
+
+client.key
+client_combined.crt
+logstash.key
+logstash_combined.crt
+org_ca.crt
+
+Use [Secure Logstash Connections Using SSL Certificates](https://www.linode.com/docs/guides/secure-logstash-connections-using-ssl-certificates/#install-logstash) to learn how to create the certificates.

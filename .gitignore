@@ -7,3 +7,5 @@
 .idea/.gitignore
 /logstash/certificates/*.crt
 /logstash/certificates/*.key
+/filebeat/certificates/*.crt
+/filebeat/certificates/*.key
