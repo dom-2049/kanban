@@ -89,6 +89,8 @@ services:
       context: ./filebeat
     volumes:
       - logs:/logs:ro
+    ports:
+      - 80:80
     deploy:
       resources:
         limits:
