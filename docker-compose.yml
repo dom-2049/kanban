@@ -26,6 +26,7 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgres
+      - ./initial-structure.sql:/docker-entrypoint-initdb.d/initial-structure.sql
     build:
       dockerfile: Dockerfile
       context: ./postgres
